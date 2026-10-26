@@ -64,6 +64,62 @@ internal sealed unsafe class WindowListService
 
     public static void Close(nint hwnd) => Native.PostMessage(hwnd, Native.WM_CLOSE, 0, 0);
 
+    /// <summary>
+    /// Nicht beim Datei-Explorer (gleicher Prozess wie Desktop und Shell), nicht bei tomodachi selbst,
+    /// und nicht, wenn sich der Prozess hinter dem Fenster nicht sicher bestimmen lässt.
+    /// </summary>
+    public static bool CanEndTask(nint hwnd)
+    {
+        var pid = OwningProcessId(hwnd);
+        return pid != 0 && pid != Environment.ProcessId
+            && !ProcessName(pid).Equals("explorer", StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// „Task beenden“ wie im Task-Manager: Der Prozess endet sofort, ungespeicherte Daten sind weg. Nur auf Wunsch
+    /// (Einstellung <c>EnableEndTask</c>). Ohne Adminrechte scheitert es an Programmen, die als Admin laufen.
+    /// </summary>
+    public static bool EndTask(nint hwnd)
+    {
+        if (!CanEndTask(hwnd)) return false;
+        var pid = OwningProcessId(hwnd);
+        try
+        {
+            using var process = Process.GetProcessById((int)pid);
+            Log.Info($"Task beenden: {process.ProcessName} (PID {pid})");
+            process.Kill();
+            return true;
+        }
+        catch (Exception ex) when (ex is System.ComponentModel.Win32Exception or InvalidOperationException or ArgumentException)
+        {
+            Log.Warn($"Task beenden fehlgeschlagen (PID {pid})", ex);
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Prozess, dem das Fenster wirklich gehört. Store-Apps zeigt Windows in einem Rahmen des gemeinsamen Prozesses
+    /// ApplicationFrameHost, die App selbst steckt im Kind-Fenster „Windows.UI.Core.CoreWindow“. Den Rahmen zu beenden
+    /// würde alle Store-Apps schließen. Fehlt das Kind (App pausiert), lieber 0 = unbekannt.
+    /// </summary>
+    private static uint OwningProcessId(nint hwnd)
+    {
+        Native.GetWindowThreadProcessId(hwnd, out var pid);
+        if (ClassName(hwnd) != "ApplicationFrameWindow") return pid;
+
+        var app = Native.FindWindowEx(hwnd, 0, "Windows.UI.Core.CoreWindow", null);
+        if (app == 0) return 0;
+        Native.GetWindowThreadProcessId(app, out var appPid);
+        return appPid;
+    }
+
+    private static string ClassName(nint hwnd)
+    {
+        var buffer = stackalloc char[64];
+        var length = Native.GetClassName(hwnd, buffer, 64);
+        return new string(buffer, 0, length);
+    }
+
     [UnmanagedCallersOnly]
     private static int Collect(nint hwnd, nint data)
     {
@@ -84,9 +140,7 @@ internal sealed unsafe class WindowListService
         if (Native.DwmGetWindowAttribute(hwnd, Native.DWMWA_CLOAKED, out var cloaked, sizeof(int)) == 0 && cloaked != 0)
             return false;
 
-        var buffer = stackalloc char[64];
-        var length = Native.GetClassName(hwnd, buffer, 64);
-        return !IgnoredClasses.Contains(new string(buffer, 0, length));
+        return !IgnoredClasses.Contains(ClassName(hwnd));
     }
 
     private static string Title(nint hwnd)

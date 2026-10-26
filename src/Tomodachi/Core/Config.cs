@@ -27,6 +27,9 @@ internal sealed class TomodachiConfig
     /// <summary>Notch auch über maximierten Fenstern verstecken, nicht nur bei Vollbild (Spiel, Video).</summary>
     public bool HideOnMaximized { get; set; } = true;
 
+    /// <summary>Rechtsklick im Fenster-Reiter bietet „Task beenden“ an (Prozess sofort beenden). Wie bei Windows standardmäßig aus.</summary>
+    public bool EnableEndTask { get; set; }
+
     /// <summary>Sprache der Oberfläche: <c>de</c>, <c>en</c> oder leer = wie Windows (Deutsch → de, sonst en).</summary>
     public string Language { get; set; } = "";
 

@@ -66,6 +66,48 @@
         </Setter>
     </Style>
 
+    <!-- Rechtsklick-Menüs (Apps, Fenster), dunkel wie die Notch. MenuItem.Tag = Icon-Zeichen. -->
+    <Style x:Key="NotchContextMenu" TargetType="ContextMenu">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ContextMenu">
+                    <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource SurfaceBorderBrush}"
+                            BorderThickness="1" CornerRadius="10" Padding="4">
+                        <ItemsPresenter />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Resources>
+            <Style TargetType="MenuItem">
+                <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+                <Setter Property="FontFamily" Value="{StaticResource UiFont}" />
+                <Setter Property="FontSize" Value="13" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="MenuItem">
+                            <Border x:Name="Bg" CornerRadius="7" Padding="10,7,16,7" Background="Transparent">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{TemplateBinding Tag}" FontFamily="{StaticResource IconFont}"
+                                               FontSize="13" Width="22" VerticalAlignment="Center" />
+                                    <ContentPresenter ContentSource="Header" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsHighlighted" Value="True">
+                                    <Setter TargetName="Bg" Property="Background" Value="{StaticResource SelectedBrush}" />
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.4" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </Style.Resources>
+    </Style>
+
     <!-- Reiter in der Notch-Kopfzeile -->
     <Style x:Key="TabButton" TargetType="RadioButton">
         <Setter Property="Foreground" Value="{StaticResource TextMutedBrush}" />

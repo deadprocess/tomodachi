@@ -22,6 +22,8 @@
   <!-- Fenster -->
   <data name="Windows_Minimized" xml:space="preserve"><value>minimiert</value></data>
   <data name="Windows_Close" xml:space="preserve"><value>Schließen</value></data>
+  <data name="Windows_BringToFront" xml:space="preserve"><value>Nach vorn holen</value></data>
+  <data name="Windows_EndTask" xml:space="preserve"><value>Task beenden</value></data>
 
   <!-- Widgets -->
   <data name="Widgets_DateFormat" xml:space="preserve"><value>dddd, d. MMMM</value></data>
@@ -67,6 +69,8 @@
   <data name="Settings_Behavior" xml:space="preserve"><value>VERHALTEN</value></data>
   <data name="Settings_HideOnMaximized" xml:space="preserve"><value>Bei maximierten Fenstern ausblenden</value></data>
   <data name="Settings_HideOnMaximizedHint" xml:space="preserve"><value>Aus: nur bei Vollbild (Spiele, Videos)</value></data>
+  <data name="Settings_EndTask" xml:space="preserve"><value>„Task beenden“ im Fenster-Reiter</value></data>
+  <data name="Settings_EndTaskHint" xml:space="preserve"><value>Rechtsklick auf ein Fenster beendet die App sofort, Ungespeichertes ist weg</value></data>
   <data name="Settings_WinKey" xml:space="preserve"><value>Win-Taste öffnet tomodachi</value></data>
   <data name="Settings_WinKeyHint" xml:space="preserve"><value>statt des Startmenüs · wirkt nach Neustart</value></data>
   <data name="Settings_HideTaskbar" xml:space="preserve"><value>Taskleiste ausblenden</value></data>

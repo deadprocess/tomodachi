@@ -128,7 +128,7 @@ public partial class NotchWindow : OverlayWindow
         Launcher.LaunchRequested += OnLaunchRequested;
         Launcher.CloseRequested += () => CloseNotch(restoreFocus: true);
         Widgets.Initialize(widgets);
-        Windows.Initialize(widgets);
+        Windows.Initialize(widgets, config);
         Windows.WindowActivated += () => CloseNotch(restoreFocus: false);
         Power.ActionRequested += action =>
         {

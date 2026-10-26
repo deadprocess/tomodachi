@@ -22,6 +22,8 @@
   <!-- Windows -->
   <data name="Windows_Minimized" xml:space="preserve"><value>minimized</value></data>
   <data name="Windows_Close" xml:space="preserve"><value>Close</value></data>
+  <data name="Windows_BringToFront" xml:space="preserve"><value>Bring to front</value></data>
+  <data name="Windows_EndTask" xml:space="preserve"><value>End task</value></data>
 
   <!-- Widgets -->
   <data name="Widgets_DateFormat" xml:space="preserve"><value>dddd, MMMM d</value></data>
@@ -67,6 +69,8 @@
   <data name="Settings_Behavior" xml:space="preserve"><value>BEHAVIOR</value></data>
   <data name="Settings_HideOnMaximized" xml:space="preserve"><value>Hide over maximized windows</value></data>
   <data name="Settings_HideOnMaximizedHint" xml:space="preserve"><value>Off: only for fullscreen (games, videos)</value></data>
+  <data name="Settings_EndTask" xml:space="preserve"><value>&quot;End task&quot; in the Windows tab</value></data>
+  <data name="Settings_EndTaskHint" xml:space="preserve"><value>right-click a window to kill its app at once, unsaved work is lost</value></data>
   <data name="Settings_WinKey" xml:space="preserve"><value>Win key opens tomodachi</value></data>
   <data name="Settings_WinKeyHint" xml:space="preserve"><value>instead of the Start menu · after a restart</value></data>
   <data name="Settings_HideTaskbar" xml:space="preserve"><value>Hide the taskbar</value></data>

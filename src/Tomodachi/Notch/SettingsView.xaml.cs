@@ -46,6 +46,7 @@ public partial class SettingsView : UserControl
     {
         _syncing = true;
         HideOnMaximized.IsChecked = _config.HideOnMaximized;
+        EnableEndTask.IsChecked = _config.EnableEndTask;
         InterceptWinKey.IsChecked = _config.InterceptWinKey;
         HideTaskbar.IsChecked = _config.HideTaskbar;
         LanguageAuto.IsChecked = _config.Language is not ("de" or "en");
@@ -130,6 +131,7 @@ public partial class SettingsView : UserControl
         switch (box.Name)
         {
             case nameof(HideOnMaximized): _config.HideOnMaximized = on; break;
+            case nameof(EnableEndTask): _config.EnableEndTask = on; break;
             case nameof(InterceptWinKey): _config.InterceptWinKey = on; break;
             case nameof(HideTaskbar): _config.HideTaskbar = on; break;
             default: return;

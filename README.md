@@ -17,7 +17,7 @@ settings and a power menu.
 | **Win key** | A tap opens the notch instead of the Start menu. Win+E, Win+L, Win+Shift+S and every other combo keep working. |
 | **Apps** | Fuzzy search over everything in "All apps", plus Steam games and program shortcuts on the desktop. Right-click → *Run as administrator*. |
 | **Widgets** | Clock and calendar, media controls, CPU / GPU / RAM with history, drives with NVMe temperatures, network. Win+W or click the avatar. |
-| **Windows** | Open and minimized windows, since there is no taskbar anymore. |
+| **Windows** | Open and minimized windows, since there is no taskbar anymore. Right-click → bring to front, close, or (opt-in) *End task*. |
 | **Power** | Lock, sleep, sign out, restart, shut down. Anything that ends the session needs a second click. |
 | **Settings** | Profile picture, notch monitor, language, Win key, taskbar, autostart, wallpaper folder. No config files needed. |
 | **Wallpapers** | Win+Ctrl+W opens a full-screen strip of slanted wallpaper cards; Enter applies the picture. |

@@ -32,8 +32,8 @@
     <sys:Double x:Key="NotchExpandedHeight">470</sys:Double>
     <!-- Power-Reiter: 48 Kopf + 104 Kacheln + 34 Laufzeit + 22 Rand -->
     <sys:Double x:Key="NotchPowerHeight">208</sys:Double>
-    <!-- Einstellungs-Reiter: 48 Kopf + 470 Inhalt + 16 Rand -->
-    <sys:Double x:Key="NotchSettingsHeight">534</sys:Double>
+    <!-- Einstellungs-Reiter: 48 Kopf + 514 Inhalt + 16 Rand -->
+    <sys:Double x:Key="NotchSettingsHeight">578</sys:Double>
     <sys:Double x:Key="NotchEarRadius">10</sys:Double>
     <sys:Double x:Key="NotchCornerRadius">16</sys:Double>
     <sys:Double x:Key="NotchExpandedCornerRadius">30</sys:Double>

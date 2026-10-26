@@ -154,6 +154,18 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="{loc:Tr Settings_EndTask}" Style="{StaticResource Title}" />
+                    <TextBlock Text="{loc:Tr Settings_EndTaskHint}" Style="{StaticResource Hint}" />
+                </StackPanel>
+                <CheckBox x:Name="EnableEndTask" Grid.Column="1" Style="{StaticResource ToggleSwitch}" Click="OnToggle" />
+            </Grid>
+
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel VerticalAlignment="Center">
                     <TextBlock Text="{loc:Tr Settings_WinKey}" Style="{StaticResource Title}" />
                     <TextBlock Text="{loc:Tr Settings_WinKeyHint}" Style="{StaticResource Hint}" />
                 </StackPanel>

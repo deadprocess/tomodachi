@@ -5,44 +5,8 @@
              FontFamily="{StaticResource UiFont}"
              KeyboardNavigation.TabNavigation="None">
     <UserControl.Resources>
-        <!-- Rechtsklick-Menü der Treffer, dunkel wie die Notch -->
-        <ContextMenu x:Key="ResultMenu" Closed="OnResultMenuClosed">
-            <ContextMenu.Template>
-                <ControlTemplate TargetType="ContextMenu">
-                    <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource SurfaceBorderBrush}"
-                            BorderThickness="1" CornerRadius="10" Padding="4">
-                        <ItemsPresenter />
-                    </Border>
-                </ControlTemplate>
-            </ContextMenu.Template>
-            <ContextMenu.Resources>
-                <Style TargetType="MenuItem">
-                    <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
-                    <Setter Property="FontFamily" Value="{StaticResource UiFont}" />
-                    <Setter Property="FontSize" Value="13" />
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="MenuItem">
-                                <Border x:Name="Bg" CornerRadius="7" Padding="10,7,16,7" Background="Transparent">
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="{TemplateBinding Tag}" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
-                                                   FontSize="13" Width="22" VerticalAlignment="Center" />
-                                        <ContentPresenter ContentSource="Header" VerticalAlignment="Center" />
-                                    </StackPanel>
-                                </Border>
-                                <ControlTemplate.Triggers>
-                                    <Trigger Property="IsHighlighted" Value="True">
-                                        <Setter TargetName="Bg" Property="Background" Value="{StaticResource SelectedBrush}" />
-                                    </Trigger>
-                                    <Trigger Property="IsEnabled" Value="False">
-                                        <Setter Property="Opacity" Value="0.4" />
-                                    </Trigger>
-                                </ControlTemplate.Triggers>
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                </Style>
-            </ContextMenu.Resources>
+        <!-- Rechtsklick-Menü der Treffer -->
+        <ContextMenu x:Key="ResultMenu" Style="{StaticResource NotchContextMenu}" Closed="OnResultMenuClosed">
             <MenuItem Header="{loc:Tr Launcher_Open}" Tag="&#xE768;" Click="OnMenuLaunch" />
             <MenuItem Header="{loc:Tr Launcher_RunAsAdmin}" Tag="&#xE7EF;" Click="OnMenuLaunchElevated" />
         </ContextMenu>
