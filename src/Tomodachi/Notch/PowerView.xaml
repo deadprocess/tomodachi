@@ -1,0 +1,41 @@
+<UserControl x:Class="Tomodachi.Notch.PowerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:notch="clr-namespace:Tomodachi.Notch"
+             FontFamily="{StaticResource UiFont}">
+    <!-- Power-Reiter der Notch: Sperren, Energie sparen, Abmelden, Neu starten, Herunterfahren. -->
+    <StackPanel>
+        <ItemsControl x:Name="Actions">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid Rows="1" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="{x:Type notch:PowerItem}">
+                    <Border x:Name="Tile" Height="104" Margin="5,0" CornerRadius="16" Cursor="Hand"
+                            Background="{StaticResource CardBrush}" BorderBrush="Transparent" BorderThickness="1.5"
+                            MouseLeftButtonUp="OnTileClicked">
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock x:Name="Icon" Text="{Binding Icon}" FontFamily="{StaticResource IconFont}" FontSize="24"
+                                       Foreground="{StaticResource TextBrush}" HorizontalAlignment="Center" />
+                            <TextBlock x:Name="Caption" Text="{Binding Caption}" Style="{StaticResource Label}" FontSize="12.5"
+                                       HorizontalAlignment="Center" Margin="0,12,0,0" />
+                        </StackPanel>
+                    </Border>
+                    <DataTemplate.Triggers>
+                        <Trigger SourceName="Tile" Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Tile" Property="Background" Value="{StaticResource SelectedBrush}" />
+                        </Trigger>
+                        <DataTrigger Binding="{Binding IsArmed}" Value="True">
+                            <Setter TargetName="Tile" Property="BorderBrush" Value="{StaticResource DangerBrush}" />
+                            <Setter TargetName="Icon" Property="Foreground" Value="{StaticResource DangerBrush}" />
+                            <Setter TargetName="Caption" Property="Foreground" Value="{StaticResource DangerBrush}" />
+                        </DataTrigger>
+                    </DataTemplate.Triggers>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <TextBlock x:Name="Uptime" Style="{StaticResource Muted}" HorizontalAlignment="Center" Margin="0,14,0,0" />
+    </StackPanel>
+</UserControl>

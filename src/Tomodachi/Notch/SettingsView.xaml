@@ -1,0 +1,209 @@
+<UserControl x:Class="Tomodachi.Notch.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="clr-namespace:Tomodachi.Localization"
+             FontFamily="{StaticResource UiFont}">
+    <!-- Einstellungs-Reiter der Notch: alles, wofür man sonst config.json bearbeiten müsste. Nur Maus, kein Fokus nötig. -->
+    <UserControl.Resources>
+        <!-- Schalter (an/aus) als Pille -->
+        <Style x:Key="ToggleSwitch" TargetType="CheckBox">
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <Border x:Name="Track" Width="40" Height="22" CornerRadius="11" Background="{StaticResource TrackBrush}">
+                            <Ellipse x:Name="Knob" Width="16" Height="16" Margin="3,0" HorizontalAlignment="Left"
+                                     Fill="{StaticResource TextMutedBrush}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Track" Property="Background" Value="{StaticResource AccentBrush}" />
+                                <Setter TargetName="Knob" Property="HorizontalAlignment" Value="Right" />
+                                <Setter TargetName="Knob" Property="Fill" Value="{StaticResource SurfaceBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.4" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="PillButton" TargetType="Button">
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="Margin" Value="6,0,0,0" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bg" CornerRadius="13" Padding="12,5" Background="{StaticResource CardBrush}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="{StaticResource SelectedBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="Row" TargetType="Grid">
+            <Setter Property="MinHeight" Value="42" />
+            <Setter Property="Margin" Value="0,0,0,2" />
+        </Style>
+        <Style x:Key="Title" TargetType="TextBlock" BasedOn="{StaticResource Label}">
+            <Setter Property="FontSize" Value="13.5" />
+        </Style>
+        <Style x:Key="Hint" TargetType="TextBlock" BasedOn="{StaticResource Muted}">
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="Margin" Value="0,1,0,0" />
+        </Style>
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+        <StackPanel Margin="8,0,8,8">
+            <TextBlock Text="{loc:Tr Settings_Appearance}" Style="{StaticResource CardHeader}" />
+
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid Width="36" Height="36" VerticalAlignment="Center">
+                    <Image x:Name="AvatarPreview" RenderOptions.BitmapScalingMode="HighQuality">
+                        <Image.Clip>
+                            <EllipseGeometry Center="18,18" RadiusX="18" RadiusY="18" />
+                        </Image.Clip>
+                    </Image>
+                    <Ellipse Stroke="{StaticResource AvatarRingBrush}" StrokeThickness="1" />
+                </Grid>
+                <StackPanel Grid.Column="1" Margin="12,0" VerticalAlignment="Center">
+                    <TextBlock Text="{loc:Tr Settings_Avatar}" Style="{StaticResource Title}" />
+                    <TextBlock x:Name="AvatarHint" Style="{StaticResource Hint}" />
+                </StackPanel>
+                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                    <Button Content="{loc:Tr Settings_AvatarChoose}" Style="{StaticResource PillButton}" Click="OnChooseAvatar" />
+                    <Button x:Name="ResetAvatar" Content="{loc:Tr Settings_AvatarReset}" Style="{StaticResource PillButton}" Click="OnResetAvatar" />
+                </StackPanel>
+            </Grid>
+
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="{loc:Tr Settings_Monitor}" Style="{StaticResource Title}" />
+                    <TextBlock Text="{loc:Tr Settings_MonitorHint}" Style="{StaticResource Hint}" />
+                </StackPanel>
+                <ItemsControl x:Name="MonitorChoices" Grid.Column="1" VerticalAlignment="Center">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+            </Grid>
+
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="{loc:Tr Settings_Language}" Style="{StaticResource Title}" />
+                    <TextBlock Text="{loc:Tr Settings_LanguageHint}" Style="{StaticResource Hint}" />
+                </StackPanel>
+                <!-- Sprachnamen in der eigenen Sprache, damit man sie auch in der falschen findet -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <RadioButton x:Name="LanguageAuto" Style="{StaticResource TabButton}" GroupName="Language" Tag=""
+                                 Content="{loc:Tr Settings_LanguageAuto}" Checked="OnLanguageChosen" />
+                    <RadioButton x:Name="LanguageDe" Style="{StaticResource TabButton}" GroupName="Language" Tag="de"
+                                 Content="Deutsch" Checked="OnLanguageChosen" />
+                    <RadioButton x:Name="LanguageEn" Style="{StaticResource TabButton}" GroupName="Language" Tag="en"
+                                 Content="English" Checked="OnLanguageChosen" />
+                </StackPanel>
+            </Grid>
+
+            <TextBlock Text="{loc:Tr Settings_Behavior}" Style="{StaticResource CardHeader}" Margin="0,10,0,8" />
+
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="{loc:Tr Settings_HideOnMaximized}" Style="{StaticResource Title}" />
+                    <TextBlock Text="{loc:Tr Settings_HideOnMaximizedHint}" Style="{StaticResource Hint}" />
+                </StackPanel>
+                <CheckBox x:Name="HideOnMaximized" Grid.Column="1" Style="{StaticResource ToggleSwitch}" Click="OnToggle" />
+            </Grid>
+
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="{loc:Tr Settings_WinKey}" Style="{StaticResource Title}" />
+                    <TextBlock Text="{loc:Tr Settings_WinKeyHint}" Style="{StaticResource Hint}" />
+                </StackPanel>
+                <CheckBox x:Name="InterceptWinKey" Grid.Column="1" Style="{StaticResource ToggleSwitch}" Click="OnToggle" />
+            </Grid>
+
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="{loc:Tr Settings_HideTaskbar}" Style="{StaticResource Title}" />
+                    <TextBlock Text="{loc:Tr Settings_HideTaskbarHint}" Style="{StaticResource Hint}" />
+                </StackPanel>
+                <CheckBox x:Name="HideTaskbar" Grid.Column="1" Style="{StaticResource ToggleSwitch}" Click="OnToggle" />
+            </Grid>
+
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="{loc:Tr Settings_Autostart}" Style="{StaticResource Title}" />
+                    <TextBlock x:Name="AutostartHint" Text="{loc:Tr Settings_AutostartHint}" Style="{StaticResource Hint}" />
+                </StackPanel>
+                <CheckBox x:Name="Autostart" Grid.Column="1" Style="{StaticResource ToggleSwitch}" Click="OnAutostart" />
+            </Grid>
+
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="{loc:Tr Settings_WallpaperFolder}" Style="{StaticResource Title}" />
+                    <TextBlock x:Name="WallpaperFolder" Style="{StaticResource Hint}" />
+                </StackPanel>
+                <Button Grid.Column="1" Content="{loc:Tr Settings_Change}" Style="{StaticResource PillButton}" Click="OnChooseWallpaperFolder" />
+            </Grid>
+
+            <Grid Margin="0,12,0,0">
+                <TextBlock x:Name="Version" Style="{StaticResource Hint}" VerticalAlignment="Center" />
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="{loc:Tr Settings_Logs}" Style="{StaticResource PillButton}" Click="OnOpenLogs" />
+                    <Button x:Name="RestartButton" Content="{loc:Tr Settings_Restart}" Style="{StaticResource PillButton}" Click="OnRestart" />
+                    <Button Content="{loc:Tr Settings_Quit}" Style="{StaticResource PillButton}" Click="OnQuit" />
+                </StackPanel>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

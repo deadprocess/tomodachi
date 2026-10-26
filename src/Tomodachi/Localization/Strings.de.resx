@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Deutsche Texte der Oberfläche. Keys wie in Strings.resx. -->
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <!-- Notch-Kopfzeile -->
+  <data name="Tab_Apps" xml:space="preserve"><value>Apps</value></data>
+  <data name="Tab_Widgets" xml:space="preserve"><value>Widgets</value></data>
+  <data name="Tab_Windows" xml:space="preserve"><value>Fenster</value></data>
+  <data name="Tab_Settings" xml:space="preserve"><value>Einstellungen</value></data>
+  <data name="Tab_Power" xml:space="preserve"><value>Powermenü</value></data>
+
+  <!-- Apps -->
+  <data name="Launcher_Search" xml:space="preserve"><value>Apps suchen …</value></data>
+  <data name="Launcher_NoResults" xml:space="preserve"><value>Keine Treffer</value></data>
+  <data name="Launcher_Open" xml:space="preserve"><value>Starten</value></data>
+  <data name="Launcher_RunAsAdmin" xml:space="preserve"><value>Als Administrator starten</value></data>
+
+  <!-- Fenster -->
+  <data name="Windows_Minimized" xml:space="preserve"><value>minimiert</value></data>
+  <data name="Windows_Close" xml:space="preserve"><value>Schließen</value></data>
+
+  <!-- Widgets -->
+  <data name="Widgets_DateFormat" xml:space="preserve"><value>dddd, d. MMMM</value></data>
+  <data name="Widgets_NoMedia" xml:space="preserve"><value>Keine Wiedergabe</value></data>
+  <data name="Widgets_Previous" xml:space="preserve"><value>Zurück</value></data>
+  <data name="Widgets_Next" xml:space="preserve"><value>Weiter</value></data>
+  <data name="Widgets_Drives" xml:space="preserve"><value>LAUFWERKE</value></data>
+  <data name="Widgets_System" xml:space="preserve"><value>SYSTEM</value></data>
+  <data name="Widgets_Memory" xml:space="preserve"><value>Arbeitsspeicher</value></data>
+  <data name="Widgets_Network" xml:space="preserve"><value>NETZWERK</value></data>
+  <data name="Widgets_Offline" xml:space="preserve"><value>Keine Verbindung</value></data>
+  <data name="Net_WiFi" xml:space="preserve"><value>WLAN</value></data>
+
+  <!-- Power -->
+  <data name="Power_Lock" xml:space="preserve"><value>Sperren</value></data>
+  <data name="Power_Sleep" xml:space="preserve"><value>Energie sparen</value></data>
+  <data name="Power_SignOut" xml:space="preserve"><value>Abmelden</value></data>
+  <data name="Power_Restart" xml:space="preserve"><value>Neu starten</value></data>
+  <data name="Power_Shutdown" xml:space="preserve"><value>Herunterfahren</value></data>
+  <data name="Power_Confirm" xml:space="preserve"><value>Nochmal klicken</value></data>
+  <data name="Power_Uptime" xml:space="preserve"><value>Läuft seit {0}</value></data>
+  <data name="Uptime_OneDay" xml:space="preserve"><value>1 Tag {1} Std</value></data>
+  <data name="Uptime_Days" xml:space="preserve"><value>{0} Tagen {1} Std</value></data>
+  <data name="Uptime_Hours" xml:space="preserve"><value>{0} Std {1} Min</value></data>
+  <data name="Uptime_Minutes" xml:space="preserve"><value>{0} Min</value></data>
+
+  <!-- Einstellungen -->
+  <data name="Settings_Appearance" xml:space="preserve"><value>AUSSEHEN</value></data>
+  <data name="Settings_Avatar" xml:space="preserve"><value>Profilbild</value></data>
+  <data name="Settings_AvatarChoose" xml:space="preserve"><value>Bild wählen …</value></data>
+  <data name="Settings_AvatarReset" xml:space="preserve"><value>Standard</value></data>
+  <data name="Settings_AvatarCustom" xml:space="preserve"><value>eigenes Bild</value></data>
+  <data name="Settings_AvatarDefault" xml:space="preserve"><value>Standardbild</value></data>
+  <data name="Settings_AvatarUnreadable" xml:space="preserve"><value>Bild nicht lesbar, anderes probieren</value></data>
+  <data name="Settings_AvatarDialog" xml:space="preserve"><value>Profilbild für die Notch</value></data>
+  <data name="Settings_ImageFilter" xml:space="preserve"><value>Bilder|*.png;*.jpg;*.jpeg;*.bmp;*.gif;*.webp|Alle Dateien|*.*</value></data>
+  <data name="Settings_Monitor" xml:space="preserve"><value>Notch auf Monitor</value></data>
+  <data name="Settings_MonitorHint" xml:space="preserve"><value>von links nach rechts</value></data>
+  <data name="Settings_PrimaryMonitor" xml:space="preserve"><value>Hauptmonitor</value></data>
+  <data name="Settings_Language" xml:space="preserve"><value>Sprache</value></data>
+  <data name="Settings_LanguageHint" xml:space="preserve"><value>wirkt nach Neustart</value></data>
+  <data name="Settings_LanguageAuto" xml:space="preserve"><value>Wie Windows</value></data>
+  <data name="Settings_Behavior" xml:space="preserve"><value>VERHALTEN</value></data>
+  <data name="Settings_HideOnMaximized" xml:space="preserve"><value>Bei maximierten Fenstern ausblenden</value></data>
+  <data name="Settings_HideOnMaximizedHint" xml:space="preserve"><value>Aus: nur bei Vollbild (Spiele, Videos)</value></data>
+  <data name="Settings_WinKey" xml:space="preserve"><value>Win-Taste öffnet tomodachi</value></data>
+  <data name="Settings_WinKeyHint" xml:space="preserve"><value>statt des Startmenüs · wirkt nach Neustart</value></data>
+  <data name="Settings_HideTaskbar" xml:space="preserve"><value>Taskleiste ausblenden</value></data>
+  <data name="Settings_HideTaskbarHint" xml:space="preserve"><value>kommt beim Beenden immer zurück · wirkt nach Neustart</value></data>
+  <data name="Settings_Autostart" xml:space="preserve"><value>Mit Windows starten</value></data>
+  <data name="Settings_AutostartHint" xml:space="preserve"><value>mit Adminrechten, fragt einmal nach</value></data>
+  <data name="Settings_AutostartAdding" xml:space="preserve"><value>wird eingerichtet …</value></data>
+  <data name="Settings_AutostartRemoving" xml:space="preserve"><value>wird entfernt …</value></data>
+  <data name="Settings_WallpaperFolder" xml:space="preserve"><value>Wallpaper-Ordner (Win+Strg+W)</value></data>
+  <data name="Settings_WallpaperDialog" xml:space="preserve"><value>Ordner mit Wallpaper-Bildern</value></data>
+  <data name="Settings_Change" xml:space="preserve"><value>Ändern …</value></data>
+  <data name="Settings_Logs" xml:space="preserve"><value>Log-Ordner</value></data>
+  <data name="Settings_Restart" xml:space="preserve"><value>Neu starten</value></data>
+  <data name="Settings_RestartNow" xml:space="preserve"><value>Jetzt neu starten</value></data>
+  <data name="Settings_Quit" xml:space="preserve"><value>Beenden</value></data>
+  <data name="Settings_Elevated" xml:space="preserve"><value>mit Adminrechten</value></data>
+  <data name="Settings_NotElevated" xml:space="preserve"><value>ohne Adminrechte</value></data>
+
+  <!-- Wallpaper-Picker -->
+  <data name="Wallpaper_Hint" xml:space="preserve"><value>←  →   Auswählen          Enter   Setzen          Shift+Enter   Alle Monitore          Esc   Schließen</value></data>
+  <data name="Wallpaper_NoImages" xml:space="preserve"><value>Keine Bilder in {0}</value></data>
+
+  <!-- Autostart (install / uninstall) -->
+  <data name="Autostart_Installed" xml:space="preserve"><value>tomodachi startet jetzt mit Windows (mit Adminrechten).</value></data>
+  <data name="Autostart_Removed" xml:space="preserve"><value>tomodachi startet nicht mehr mit Windows.</value></data>
+  <data name="Autostart_Failed" xml:space="preserve"><value>tomodachi: Autostart einrichten fehlgeschlagen ({0}).</value></data>
+</root>

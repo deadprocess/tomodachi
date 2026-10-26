@@ -1,0 +1,63 @@
+tomodachi – eine Shell für Windows im Stil von Noctalia
+=======================================================
+
+tomodachi ersetzt Startmenü und Taskleiste durch eine „Notch“ oben am Bildschirm.
+Die Win-Taste klappt sie auf. Darin gibt es Reiter:
+
+  Apps          App-Starter: tippen, Enter. Findet Startmenü-Apps, Steam-Spiele
+                und Programm-Verknüpfungen auf dem Desktop.
+  Widgets       Uhr, Kalender, Musiksteuerung, CPU/GPU/RAM, Laufwerke, Netzwerk
+  Fenster       alle offenen Fenster (statt Taskleiste)
+  ⚙             Einstellungen: Profilbild, Monitor, Sprache, Autostart, …
+  ⏻             Sperren, Energie sparen, Abmelden, Neu starten, Herunterfahren
+
+Dazu: Win+W öffnet die Widgets, Win+Strg+W einen Wallpaper-Wechsler
+(Bilder aus dem Ordner „Wallpaper“ in deinem Benutzerordner, änderbar in den Einstellungen).
+
+
+LOSLEGEN
+--------
+1. Den Ordner an einen festen Ort legen, z. B. C:\Programme-eigene\tomodachi
+   (nicht in „Downloads“ lassen, der Autostart merkt sich den Pfad).
+2. tomodachi.exe doppelklicken.
+   Windows warnt evtl. „Der Computer wurde durch Windows geschützt“: Die Exe ist
+   nicht signiert. „Weitere Informationen“ → „Trotzdem ausführen“.
+3. Die Taskleiste verschwindet, oben erscheint die Notch. Win-Taste drücken.
+4. Empfohlen: In den Einstellungen (⚙) „Mit Windows starten“ einschalten.
+   Das fragt einmal nach Adminrechten. Nur dann funktioniert die Win-Taste auch,
+   während ein Admin-Fenster vorne ist, und nur dann gibt es SSD-Temperaturen.
+
+
+NOTAUSSTIEG – falls irgendwas komisch ist
+-----------------------------------------
+  Strg+Alt+Shift+Q           beendet tomodachi, die Taskleiste kommt zurück
+  Einstellungen → Beenden    dasselbe per Maus
+
+tomodachi stellt beim Beenden immer alles wieder her. Stürzt es ab, räumt ein
+kleiner Wächter-Prozess automatisch auf. Falls doch mal etwas hängen bleibt:
+Win+R → Pfad\zu\tomodachi.exe --restore → Enter.
+
+
+WIEDER LOSWERDEN
+----------------
+1. Einstellungen → „Mit Windows starten“ ausschalten
+   (oder Win+R → Pfad\zu\tomodachi.exe --uninstall).
+2. Einstellungen → Beenden.
+3. Ordner löschen. Einstellungen und Logs liegen in %APPDATA%\tomodachi,
+   der Icon-Cache in %LOCALAPPDATA%\tomodachi. Beides darf weg.
+
+
+GUT ZU WISSEN
+-------------
+- Nur Windows 10/11, 64 Bit. Oberfläche auf Deutsch.
+- Läuft ein Spiel oder Video im Vollbild, oder ist ein Fenster maximiert, versteckt
+  sich die Notch. Ein Win-Tipp holt sie trotzdem hervor.
+- CPU-Temperaturen gibt es nur mit dem optionalen Treiber PawnIO (https://pawnio.eu),
+  alles andere geht ohne.
+- Eigenes Profilbild: Einstellungen → Profilbild → „Bild wählen …“
+  (wird rund zugeschnitten und in %APPDATA%\tomodachi\avatar.png gespeichert).
+- Probleme? Einstellungen → Log-Ordner, die neueste Datei mitschicken.
+
+Komplett von einer KI (Claude) für den persönlichen Gebrauch gebaut, geteilt, wie es ist.
+Fremde Bibliotheken und ihre Lizenzen: THIRD-PARTY-NOTICES.txt (Englisch).
+Quellcode: https://github.com/deadprocess/tomodachi

@@ -1,0 +1,13 @@
+# Build output
+bin/
+obj/
+dist/
+TestResults/
+*.user
+.vs/
+.idea/
+
+# Private fan art (Reze avatar), personal use only. Never publish.
+# Your own profile picture lives in %APPDATA%\tomodachi\avatar.png anyway.
+assets/avatar/reze.png
+assets/avatar/source/

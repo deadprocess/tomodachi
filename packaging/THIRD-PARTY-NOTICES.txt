@@ -1,0 +1,32 @@
+Third-party components in tomodachi.exe
+=======================================
+
+tomodachi.exe bundles the following libraries unmodified. They belong to their
+respective authors and are licensed as listed.
+
+Mozilla Public License 2.0 (https://mozilla.org/MPL/2.0/)
+Source code is available at the addresses below:
+
+  LibreHardwareMonitorLib 0.9.6   https://github.com/LibreHardwareMonitor/LibreHardwareMonitor
+                                  (hardware sensors: CPU, GPU, RAM, drives)
+  BlackSharp.Core 1.0.7           https://github.com/Blacktempel/BlackSharp
+  DiskInfoToolkit 1.1.2           https://github.com/Blacktempel/DiskInfoToolkit
+  RAMSPDToolkit-NDD 1.4.2         https://github.com/Blacktempel/RAMSPDToolkit
+
+Apache License 2.0 (https://www.apache.org/licenses/LICENSE-2.0)
+
+  HidSharp 2.6.4                  https://software.seekye.com/hidsharp
+                                  Copyright 2010-2025 James F. Bellinger
+
+MIT License (https://opensource.org/licenses/MIT)
+
+  .NET runtime and Windows Desktop (WPF), System.Management, System.IO.Ports,
+  System.IO.FileSystem.AccessControl   https://github.com/dotnet
+                                  Copyright (c) .NET Foundation and Contributors
+  Mono.Posix.NETStandard 1.0.0    https://github.com/mono/mono
+                                  Copyright (c) Microsoft Corporation
+
+Optional, not included: PawnIO (https://pawnio.eu). If the driver is installed,
+LibreHardwareMonitor uses it for CPU temperatures.
+
+tomodachi itself is MIT licensed: https://github.com/deadprocess/tomodachi

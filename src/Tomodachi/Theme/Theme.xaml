@@ -1,0 +1,45 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+    <!-- Erste Tokens. Das volle Theme-System (Paket 0.3) baut hierauf auf. -->
+
+    <!-- voll deckend: bei 95 % schien heller Text dahinter als Schatten durch -->
+    <Color x:Key="SurfaceColor">#FF0E0E12</Color>
+    <Color x:Key="SurfaceBorderColor">#1FFFFFFF</Color>
+    <Color x:Key="TextColor">#E6FFFFFF</Color>
+    <Color x:Key="TextMutedColor">#99FFFFFF</Color>
+
+    <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource SurfaceColor}" />
+    <SolidColorBrush x:Key="SurfaceBorderBrush" Color="{StaticResource SurfaceBorderColor}" />
+    <SolidColorBrush x:Key="TextBrush" Color="{StaticResource TextColor}" />
+    <SolidColorBrush x:Key="TextMutedBrush" Color="{StaticResource TextMutedColor}" />
+
+    <SolidColorBrush x:Key="InputBrush" Color="#14FFFFFF" />
+    <SolidColorBrush x:Key="HoverBrush" Color="#0FFFFFFF" />
+    <SolidColorBrush x:Key="SelectedBrush" Color="#21FFFFFF" />
+    <SolidColorBrush x:Key="AccentBrush" Color="#8FC2FF" />
+    <SolidColorBrush x:Key="AvatarRingBrush" Color="#40FFFFFF" />
+    <SolidColorBrush x:Key="DangerBrush" Color="#FF8A8A" />
+
+    <FontFamily x:Key="UiFont">Segoe UI Variable Text, Segoe UI</FontFamily>
+
+    <!-- Notch. Ausgeklappt = Launcher: 48 Kopf + 44 Suchfeld + 10 + 8 × 44 Treffer + 16 Rand -->
+    <sys:Double x:Key="NotchWidth">180</sys:Double>
+    <sys:Double x:Key="NotchHeight">40</sys:Double>
+    <sys:Double x:Key="NotchExpandedWidth">640</sys:Double>
+    <!-- Widgets-Reiter: drei Spalten -->
+    <sys:Double x:Key="NotchWidgetsWidth">960</sys:Double>
+    <sys:Double x:Key="NotchExpandedHeight">470</sys:Double>
+    <!-- Power-Reiter: 48 Kopf + 104 Kacheln + 34 Laufzeit + 22 Rand -->
+    <sys:Double x:Key="NotchPowerHeight">208</sys:Double>
+    <!-- Einstellungs-Reiter: 48 Kopf + 470 Inhalt + 16 Rand -->
+    <sys:Double x:Key="NotchSettingsHeight">534</sys:Double>
+    <sys:Double x:Key="NotchEarRadius">10</sys:Double>
+    <sys:Double x:Key="NotchCornerRadius">16</sys:Double>
+    <sys:Double x:Key="NotchExpandedCornerRadius">30</sys:Double>
+    <sys:Double x:Key="AvatarSize">30</sys:Double>
+
+    <!-- Animation -->
+    <Duration x:Key="FastDuration">0:0:0.15</Duration>
+    <Duration x:Key="MediumDuration">0:0:0.25</Duration>
+</ResourceDictionary>
