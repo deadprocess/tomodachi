@@ -23,7 +23,8 @@ internal sealed class FullscreenWatcher : IDisposable
 
     public FullscreenWatcher()
     {
-        _timer = new DispatcherTimer(TimeSpan.FromMilliseconds(500), DispatcherPriority.Background, (_, _) => Check(),
+        // 250 ms: Die Snap-Leiste erscheint während man zieht, die Notch soll ihr rasch Platz machen
+        _timer = new DispatcherTimer(TimeSpan.FromMilliseconds(250), DispatcherPriority.Background, (_, _) => Check(),
             Dispatcher.CurrentDispatcher);
         _timer.Start();
     }
@@ -45,15 +46,17 @@ internal sealed class FullscreenWatcher : IDisposable
         if (now == IsFullscreen) return;
         IsFullscreen = now;
         // Nur der Fensterklasse wegen (z. B. „UnrealWindow“, „MozillaWindowClass“), damit Fehlerkennungen nachvollziehbar sind
-        Log.Info(now ? $"Monitor ausgefüllt ({window}), Notch versteckt" : "Monitor frei, Notch wieder da");
+        Log.Info(now ? $"Notch versteckt ({window})" : "Notch wieder da");
         Changed?.Invoke(now);
     }
 
-    /// <returns>Fensterklasse (und „maximiert“) des ausfüllenden Fensters, oder null.</returns>
+    /// <returns>Grund fürs Verstecken (Fensterklasse, „maximiert“, „Snap-Leiste“), oder null.</returns>
     private string? DetectFullscreen()
     {
         var notchMonitor = Monitors.NotchHandle();
         var monitor = Monitors.Info(notchMonitor).rcMonitor;
+        if (SnapBarVisible(monitor)) return "Snap-Leiste";
+
         var hwnd = WindowUnderNotch(monitor.Left + monitor.Width / 2, monitor.Top);
         if (hwnd == 0) return null;
 
@@ -66,6 +69,27 @@ internal sealed class FullscreenWatcher : IDisposable
             && rect.Right >= monitor.Right && rect.Bottom >= monitor.Bottom;
         if (!coversMonitor || OtherWindowHasFocus(hwnd, notchMonitor)) return null;
         return Native.IsZoomed(hwnd) ? $"{className}, maximiert" : className;
+    }
+
+    /// <summary>
+    /// Die Snap-Leiste von Windows 11 (Fenster an den oberen Rand ziehen): ein Explorer-Fenster der Klasse
+    /// <c>XamlExplorerHostIslandWindow</c> ohne Titel, oben am Monitor, gut 2560 × 360 px, das nur während des Ziehens
+    /// existiert (gemessen 27.10.2026). Dieselbe Klasse nutzt Windows für Alt+Tab und Aufgabenansicht, die sind aber
+    /// bildschirmfüllend und haben einen Titel. Die Notch säße sonst mitten auf den Layout-Kacheln.
+    /// </summary>
+    private static bool SnapBarVisible(RECT monitor)
+    {
+        for (var hwnd = Native.FindWindowEx(0, 0, "XamlExplorerHostIslandWindow", null); hwnd != 0;
+             hwnd = Native.FindWindowEx(0, hwnd, "XamlExplorerHostIslandWindow", null))
+        {
+            if (!Native.IsWindowVisible(hwnd) || Native.GetWindowTextLength(hwnd) > 0) continue;
+            if (Native.DwmGetWindowAttribute(hwnd, Native.DWMWA_CLOAKED, out var cloaked, sizeof(int)) == 0 && cloaked != 0) continue;
+
+            Native.GetWindowRect(hwnd, out var rect);
+            var atTop = rect.Top == monitor.Top && rect.Left < monitor.Right && rect.Right > monitor.Left;
+            if (atTop && rect.Height < monitor.Height / 2) return true;
+        }
+        return false;
     }
 
     /// <summary>
