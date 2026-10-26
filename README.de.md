@@ -22,6 +22,19 @@ Die Oberfläche ist auf Deutsch oder Englisch, je nach Windows-Sprache oder fest
 - `tomodachi.exe --restore`: nimmt alle Änderungen am System zurück, auch ohne laufendes tomodachi.
 - Bei einem Absturz räumt ein Wächter-Prozess automatisch auf.
 
+## Sicherheit & Privatsphäre
+
+- **Kein Netzwerk:** keine Verbindungen, keine Telemetrie, keine Update-Prüfung.
+- **Nur die Win-Taste:** Alle anderen Tasten gehen unverändert durch und werden nie gespeichert, auch nicht im Log.
+- **Adminrechte sind optional:** Sie dienen nur dazu, dass die Win-Taste auch über Admin-Fenstern und Spielen mit
+  Anti-Cheat funktioniert. Apps aus dem Launcher starten ohne Adminrechte, außer du wählst „Als Administrator starten“.
+- **Alles umkehrbar:** Änderungen an der Taskleiste stehen vorher im Wiederherstellungs-Journal und werden beim
+  Beenden, Absturz oder `--restore` zurückgenommen. In die Registry schreibt tomodachi nichts.
+- **Deine Daten bleiben lokal:** in `%APPDATA%\tomodachi` und `%LOCALAPPDATA%\tomodachi`.
+- **Die Exe unter Releases baut GitHub selbst** aus genau diesem Quellcode.
+
+Details in der [englischen README](README.md#security--privacy).
+
 ## Lizenz
 
 [MIT](LICENSE). Fremde Bibliotheken: [packaging/THIRD-PARTY-NOTICES.txt](packaging/THIRD-PARTY-NOTICES.txt).

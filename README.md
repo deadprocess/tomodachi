@@ -51,6 +51,29 @@ tomodachi touches the taskbar and the Win key, so it comes with a safety net:
 
 To uninstall: Settings → turn off **Start with Windows** → **Quit**, then delete the folder and `%APPDATA%\tomodachi`.
 
+## Security & privacy
+
+tomodachi hooks the keyboard and can run as admin, so here is exactly what it does with that:
+
+- **No network.** tomodachi's own code opens no network connections: no telemetry, no update checks, no accounts.
+  The network widget only reads your adapter's traffic counters.
+- **Keyboard: only the Win key.** The hook acts on the Win key (plus Win+W, Win+L, Ctrl+Esc, and Esc while the notch
+  is open). Every other key passes through untouched and is never stored. Even the debug log only records
+  "other key", never which one.
+- **Admin rights are optional.** They're only used so the Win key also works while an admin window or a game with
+  anti-cheat is focused. They come from a Task Scheduler entry you enable in Settings and can remove any time.
+  Apps you start from the launcher run *without* admin rights unless you pick *Run as administrator*.
+- **System changes are reversible.** It changes the taskbar (auto-hide, hidden windows), and, only when you ask,
+  the autostart task and your wallpaper. Taskbar changes go to a restore journal first and are undone on quit,
+  crash, sign-out or `--restore`. It reads two registry values (Steam's path, the fast-startup flag) and writes none.
+- **Your data stays local.** Settings, logs, launch history (which apps you start, for ranking) and your profile
+  picture live in `%APPDATA%\tomodachi`, the icon cache in `%LOCALAPPDATA%\tomodachi`. Delete both and it's gone.
+- **The release is built from this source.** The exe in [Releases](../../releases) is built by GitHub Actions from
+  this repository ([workflow](.github/workflows/build.yml)), not on my PC. You can also build it yourself.
+
+The code was written by an AI and I haven't reviewed it, as said at the top. Everything above was checked against
+the code, but if you need certainty, read [`src/`](src) or build from source.
+
 ## Build
 
 Needs the .NET 10 SDK.
