@@ -90,6 +90,14 @@ public class LocalizationTests
         Assert.Equal(neutral.Order(), german.Order());
     }
 
+    [Theory]
+    [InlineData("de-DE", 10, "2 7   O K T   2 0 2 6")]
+    [InlineData("en-US", 10, "2 7   O C T   2 0 2 6")]
+    [InlineData("de-DE", 3, "2 7   M Ä R Z   2 0 2 6")] // Windows kürzt „März“ nicht weiter, wie auch Juni, Juli, Sept
+    [InlineData("de-DE", 5, "2 7   M A I   2 0 2 6")]
+    public void WallpaperDate_FollowsUiLanguage(string culture, int month, string expected) =>
+        Assert.Equal(expected, Tomodachi.Wallpaper.WallpaperOverlay.FormatDate(new DateTime(2026, month, 27), CultureInfo.GetCultureInfo(culture)));
+
     [Fact]
     public void Texts_DifferPerLanguage()
     {

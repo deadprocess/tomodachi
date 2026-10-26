@@ -63,7 +63,7 @@ public partial class WallpaperOverlay : Window
             item.IsSelected = false;
         _selected = -1;
         Cards.ItemsSource = _items;
-        DateText.Text = FormatDate(DateTime.Now);
+        DateText.Text = FormatDate(DateTime.Now, Localization.Loc.Culture);
         HintText.Text = _items.Count > 0 ? Hint : Localization.Loc.Format("Wallpaper_NoImages", _library.Folder);
 
         // Mit dem aktuellen Wallpaper dieses Monitors starten, sonst mit dem zuletzt gewählten
@@ -198,8 +198,9 @@ public partial class WallpaperOverlay : Window
     }
 
     // "18 SEP 2026" mit weitem Buchstabenabstand; TextBlock kennt kein Letter-Spacing, daher schmale Leerzeichen.
-    private static string FormatDate(DateTime date) =>
-        string.Join(" ", date.ToString("dd MMM yyyy", CultureInfo.InvariantCulture).ToUpperInvariant().Select(c => c.ToString()));
+    // Monat in der Sprache der Oberfläche ("27 OKT 2026"), passend zum Hinweis darunter. Punkte wie in "Okt." fallen weg.
+    internal static string FormatDate(DateTime date, CultureInfo culture) =>
+        string.Join(" ", date.ToString("dd MMM yyyy", culture).Replace(".", "").ToUpper(culture).Select(c => c.ToString()));
 
     private void OnPreviewKeyDown(object sender, KeyEventArgs e)
     {
