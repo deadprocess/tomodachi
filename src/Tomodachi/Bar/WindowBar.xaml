@@ -18,6 +18,8 @@
                   Tag="{Binding Handle}" ToolTip="{Binding Title}"
                   MouseLeftButtonDown="OnTabPressed" MouseLeftButtonUp="OnTabClicked"
                   MouseRightButtonUp="OnTabRightClicked">
+                <!-- Deckende Unterlage beim Ziehen: Hover- und Auswahl-Grau sind durchscheinend, sonst schimmern die Nachbarn durch -->
+                <Border x:Name="DragBg" CornerRadius="8" Background="{StaticResource SurfaceBrush}" Visibility="Collapsed" />
                 <Border x:Name="Bg" CornerRadius="8" Background="Transparent" />
                 <Grid x:Name="Content" Margin="10,0">
                     <Grid.ColumnDefinitions>
@@ -39,6 +41,11 @@
                 <Trigger SourceName="Tab" Property="IsMouseOver" Value="True">
                     <Setter TargetName="Bg" Property="Background" Value="{StaticResource HoverBrush}" />
                 </Trigger>
+                <!-- Beim Ziehen hält die Reihe die Maus, IsMouseOver des Tabs ist dann aus. Vor IsActive: Das Auswahl-Grau gewinnt. -->
+                <DataTrigger Binding="{Binding IsDragging}" Value="True">
+                    <Setter TargetName="DragBg" Property="Visibility" Value="Visible" />
+                    <Setter TargetName="Bg" Property="Background" Value="{StaticResource HoverBrush}" />
+                </DataTrigger>
                 <DataTrigger Binding="{Binding IsActive}" Value="True">
                     <Setter TargetName="Bg" Property="Background" Value="{StaticResource SelectedBrush}" />
                     <Setter TargetName="Underline" Property="Visibility" Value="Visible" />

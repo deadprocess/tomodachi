@@ -17,7 +17,7 @@ public sealed class BarTab(nint handle) : Observable
 {
     private string _title = "";
     private ImageSource? _icon;
-    private bool _isActive, _minimized, _showTitle = true;
+    private bool _isActive, _minimized, _isDragging, _showTitle = true;
     private double _width = BarLayout.MaxTabWidth;
 
     public nint Handle { get; } = handle;
@@ -25,6 +25,7 @@ public sealed class BarTab(nint handle) : Observable
     public ImageSource? Icon { get => _icon; set => Set(ref _icon, value); }
     public bool IsActive { get => _isActive; set => Set(ref _isActive, value); }
     public bool Minimized { get => _minimized; set => Set(ref _minimized, value); }
+    public bool IsDragging { get => _isDragging; set => Set(ref _isDragging, value); }
     public double Width { get => _width; set => Set(ref _width, value); }
     public bool ShowTitle { get => _showTitle; set => Set(ref _showTitle, value); }
 }
@@ -232,7 +233,7 @@ public partial class WindowBar : OverlayWindow
         if (from >= 0 && to != from) MoveTab(from, to);
 
         container = Container(_dragged) ?? container;
-        Panel.SetZIndex(container, 1);
+        Lift(_dragged, container, true);
         var shift = Shift(container);
         shift.BeginAnimation(TranslateTransform.XProperty, null);
         shift.X = left - VisualTreeHelper.GetOffset(container).X;
@@ -252,6 +253,7 @@ public partial class WindowBar : OverlayWindow
             if (tab == _dragged || Container(tab) is not { } container) continue;
             var delta = before[tab] - VisualTreeHelper.GetOffset(container).X;
             if (Math.Abs(delta) < 0.5) continue;
+            Lift(tab, container, false); // ersetzt eine noch laufende Einrast-Animation, deren Completed dann nie käme
             Shift(container).BeginAnimation(TranslateTransform.XProperty,
                 new DoubleAnimation(delta, 0, SlideDuration) { EasingFunction = Ease });
         }
@@ -278,10 +280,21 @@ public partial class WindowBar : OverlayWindow
         {
             var shift = Shift(container);
             var settle = new DoubleAnimation(shift.X, 0, SlideDuration) { EasingFunction = Ease };
-            settle.Completed += (_, _) => Panel.SetZIndex(container, 0);
+            settle.Completed += (_, _) => Lift(tab, container, false);
             shift.BeginAnimation(TranslateTransform.XProperty, settle);
         }
+        else
+        {
+            tab.IsDragging = false;
+        }
         Dispatcher.BeginInvoke(Refresh, DispatcherPriority.Background);
+    }
+
+    /// <summary>Gezogener Tab: über den anderen und mit deckendem Hintergrund (<see cref="BarTab.IsDragging"/>).</summary>
+    private static void Lift(BarTab tab, UIElement container, bool lifted)
+    {
+        tab.IsDragging = lifted;
+        Panel.SetZIndex(container, lifted ? 1 : 0);
     }
 
     private FrameworkElement? Container(BarTab tab) => LeftTabs.ItemContainerGenerator.ContainerFromItem(tab) as FrameworkElement;
