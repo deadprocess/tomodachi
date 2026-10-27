@@ -1,6 +1,6 @@
 # tomodachi
 
-A [Noctalia](https://github.com/noctalia-dev/noctalia-shell)-style shell for Windows. It replaces the Start menu and the taskbar
+A [Noctalia](https://github.com/noctalia-dev/noctalia)-style shell for Windows. It replaces the Start menu and the taskbar
 with a single notch at the top of the screen: tap the Win key and it unfolds into an app launcher, widgets, a window list,
 settings and a power menu.
 
@@ -14,15 +14,15 @@ settings and a power menu.
 
 | | |
 |---|---|
-| **Win key** | A tap opens the notch instead of the Start menu. Win+E, Win+L, Win+Shift+S and every other combo keep working. |
+| **Win key** | A tap opens the notch instead of the Start menu. Win+E, Win+L, Win+Shift+S and the other combos keep working; only Win+W is taken (it opens tomodachi's widgets instead of Windows' widget board). |
 | **Apps** | Fuzzy search over everything in "All apps", plus Steam games and program shortcuts on the desktop. Right-click → *Run as administrator*. |
-| **Widgets** | Clock and calendar, media controls, CPU / GPU / RAM with history, drives with NVMe temperatures, network. Win+W or click the avatar. |
+| **Widgets** | Clock and calendar, media controls, CPU / GPU / RAM with history, drives (NVMe temperatures need admin rights), network. Win+W or click the avatar. |
 | **Windows** | Open and minimized windows, since there is no taskbar anymore. Right-click → bring to front, close, or (opt-in) *End task*. |
 | **Power** | Lock, sleep, sign out, restart, shut down. Anything that ends the session needs a second click. |
 | **Settings** | Profile picture, notch monitor, language, Win key, taskbar, autostart, wallpaper folder. No config files needed. |
 | **Wallpapers** | Win+Ctrl+W opens a full-screen strip of slanted wallpaper cards; Enter applies the picture. |
 | **Taskbar** | Gone while tomodachi runs, back the moment it quits. |
-| **Fullscreen** | The notch hides over games, videos and maximized windows. A Win tap still brings it up. |
+| **Fullscreen** | The notch hides over games, videos, maximized windows and Windows 11's snap bar. A Win tap still brings it up. |
 
 The UI is available in English and German (follows Windows, or pick one in Settings).
 
@@ -31,10 +31,12 @@ The UI is available in English and German (follows Windows, or pick one in Setti
 1. Download `tomodachi-<version>.zip` from [Releases](../../releases) and unzip it somewhere permanent
    (not *Downloads*; autostart remembers the path).
 2. Run `tomodachi.exe`. Windows SmartScreen will warn because the exe isn't signed: *More info → Run anyway*.
-3. Open Settings (⚙) and turn on **Start with Windows**. It asks for admin rights once. Only then does the Win key also
-   work while an admin window or a game with anti-cheat is focused.
+3. Open Settings (⚙) and turn on **Start with Windows**. It asks for admin rights once. Then press **Restart** in Settings
+   (or sign in again): from now on tomodachi runs with admin rights, and only then does the Win key also work while an
+   admin window or a game with anti-cheat is focused.
 
-Requirements: Windows 10/11 x64. The release is self-contained, no .NET install needed.
+Requirements: Windows 10 (2004 or later) or Windows 11, x64. Only tested on Windows 11.
+The release is self-contained, no .NET install needed.
 CPU temperatures need the optional [PawnIO](https://pawnio.eu) driver; everything else works without it.
 
 ## If something goes wrong
@@ -45,29 +47,35 @@ tomodachi touches the taskbar and the Win key, so it comes with a safety net:
 |---|---|
 | `Ctrl+Alt+Shift+Q` | Quit and restore everything. |
 | Settings → **Quit** | Same thing with the mouse. |
-| `tomodachi.exe --restore` | Undo all system changes, even if tomodachi isn't running. |
+| `tomodachi.exe --restore` | Bring the taskbar back, even if tomodachi isn't running (starts Explorer if needed). |
 | Crash or Task Manager kill | A watchdog process restores the taskbar automatically. |
 | `tomodachi.exe --safe` | Start with UI only: no hook, taskbar untouched. |
 
-To uninstall: Settings → turn off **Start with Windows** → **Quit**, then delete the folder and `%APPDATA%\tomodachi`.
+To uninstall: Settings → turn off **Start with Windows** (or `--uninstall`) → **Quit**, then delete the folder,
+`%APPDATA%\tomodachi` and `%LOCALAPPDATA%\tomodachi`.
 
 ## Security & privacy
 
 tomodachi hooks the keyboard and can run as admin, so here is exactly what it does with that:
 
 - **No network.** tomodachi's own code opens no network connections: no telemetry, no update checks, no accounts.
-  The network widget only reads your adapter's traffic counters.
-- **Keyboard: only the Win key.** The hook acts on the Win key (plus Win+W, Win+L, Ctrl+Esc, and Esc while the notch
-  is open). Every other key passes through untouched and is never stored. Even the debug log only records
-  "other key", never which one.
+  The network widget only reads your adapter's traffic counters. (Checked on a running instance: 0 TCP, 0 UDP.)
+- **Keyboard: it sees every key, it uses only the Win key.** That's how keyboard hooks work: a low-level hook and a
+  raw-input listener both receive every keystroke. The code only acts on the Win key (plus Win+W, Win+L, Ctrl+Esc,
+  and Esc while the notch is open); while Win is held, other keys are only checked to tell a combo from a tap.
+  Every other key passes through unchanged and is never stored or sent anywhere. Even the debug log only records
+  "other key", never which one. To work, tomodachi injects a few keys of its own: F24 (opens the notch), an unused
+  key code (stops the Start menu), and a replayed Win-down before a combo.
 - **Admin rights are optional.** They're only used so the Win key also works while an admin window or a game with
   anti-cheat is focused. They come from a Task Scheduler entry you enable in Settings and can remove any time.
   Apps you start from the launcher run *without* admin rights unless you pick *Run as administrator*.
 - **System changes are reversible.** It changes the taskbar (auto-hide, hidden windows), and, only when you ask,
   the autostart task and your wallpaper. Taskbar changes go to a restore journal first and are undone on quit,
-  crash, sign-out or `--restore`. It reads two registry values (Steam's path, the fast-startup flag) and writes none.
-- **Your data stays local.** Settings, logs, launch history (which apps you start, for ranking) and your profile
-  picture live in `%APPDATA%\tomodachi`, the icon cache in `%LOCALAPPDATA%\tomodachi`. Delete both and it's gone.
+  crash, sign-out or `--restore`. tomodachi's code reads two registry values (Steam's path, the fast-startup flag) and
+  writes none; Windows itself stores the taskbar's auto-hide setting and the scheduled task, as it always does.
+- **Your data stays local.** Settings, logs, launch history (which apps you start, for ranking), the restore journal
+  and your profile picture live in `%APPDATA%\tomodachi`, the icon cache in `%LOCALAPPDATA%\tomodachi`.
+  Delete both and it's gone.
 - **The release is built from this source.** The exe in [Releases](../../releases) is built by GitHub Actions from
   this repository ([workflow](.github/workflows/build.yml)), not on my PC. You can also build it yourself.
 
@@ -101,7 +109,8 @@ the Win key can't see keystrokes in elevated windows: the Start menu wins.
 
 | | |
 |---|---|
-| `%APPDATA%\tomodachi\config.json` | Settings (everything is also in the Settings tab; `LogLevel` only here). |
+| `%APPDATA%\tomodachi\config.json` | Settings (all in the Settings tab, except `LogLevel` and one diagnostic switch). |
+| `%APPDATA%\tomodachi\restore-journal.json` | System changes currently in effect, with their original state. |
 | `%APPDATA%\tomodachi\avatar.png` | Your profile picture. Without it the notch shows the default 友 avatar. |
 | `%APPDATA%\tomodachi\logs\` | Logs, kept for 14 days. |
 | `%LOCALAPPDATA%\tomodachi\icons\` | Icon cache, safe to delete. |
@@ -117,8 +126,9 @@ tomodachi doesn't replace Explorer; it sits on top of it.
 - **Taskbar:** auto-hide plus hidden taskbar windows. Every change is written to a restore journal first; quitting,
   crashing, signing out or `--restore` all replay it.
 - **Sensors:** [LibreHardwareMonitor](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor) (no WinRing0 driver),
-  media via the Windows media session API, everything polled only while the Widgets tab is open.
-- **Fullscreen:** looks at the topmost real window under the notch (skipping overlays), not just the focused one.
+  media via the Windows media session API, everything polled only while the Widgets or Windows tab is open.
+- **Fullscreen:** looks at the topmost real window under the notch (skipping overlays), not just the focused one,
+  and at Windows 11's snap bar.
 
 ```
 src/Tomodachi/

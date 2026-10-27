@@ -1,6 +1,6 @@
 # tomodachi (Deutsch)
 
-Eine Shell für Windows im Stil von [Noctalia](https://github.com/noctalia-dev/noctalia-shell): Startmenü und Taskleiste
+Eine Shell für Windows im Stil von [Noctalia](https://github.com/noctalia-dev/noctalia): Startmenü und Taskleiste
 weichen einer Notch oben am Bildschirm. Ein Tipp auf die Win-Taste klappt sie auf: App-Starter, Widgets, Fensterliste,
 Einstellungen und Powermenü. Die ausführliche Beschreibung steht in der [englischen README](README.md).
 
@@ -12,7 +12,8 @@ Einstellungen und Powermenü. Die ausführliche Beschreibung steht in der [engli
 
 1. `tomodachi-<Version>.zip` unter [Releases](../../releases) laden und an einen festen Ort entpacken.
 2. `tomodachi.exe` starten. SmartScreen warnt, weil die Exe nicht signiert ist: *Weitere Informationen → Trotzdem ausführen*.
-3. In den Einstellungen (⚙) **Mit Windows starten** einschalten (fragt einmal nach Adminrechten).
+3. In den Einstellungen (⚙) **Mit Windows starten** einschalten (fragt einmal nach Adminrechten), danach dort
+   **Neu starten**. Erst dann läuft tomodachi mit Adminrechten.
 
 Die Oberfläche ist auf Deutsch oder Englisch, je nach Windows-Sprache oder fest in den Einstellungen.
 
@@ -25,11 +26,14 @@ Die Oberfläche ist auf Deutsch oder Englisch, je nach Windows-Sprache oder fest
 ## Sicherheit & Privatsphäre
 
 - **Kein Netzwerk:** keine Verbindungen, keine Telemetrie, keine Update-Prüfung.
-- **Nur die Win-Taste:** Alle anderen Tasten gehen unverändert durch und werden nie gespeichert, auch nicht im Log.
+- **Sieht jede Taste, nutzt nur die Win-Taste:** So funktionieren Tastatur-Hooks, sie bekommen jeden Tastendruck mit.
+  tomodachi wertet nur die Win-Taste aus (dazu Win+W, Win+L, Strg+Esc, Esc bei offener Notch). Alle anderen Tasten
+  gehen unverändert durch und werden nie gespeichert oder verschickt, auch nicht im Log.
 - **Adminrechte sind optional:** Sie dienen nur dazu, dass die Win-Taste auch über Admin-Fenstern und Spielen mit
   Anti-Cheat funktioniert. Apps aus dem Launcher starten ohne Adminrechte, außer du wählst „Als Administrator starten“.
 - **Alles umkehrbar:** Änderungen an der Taskleiste stehen vorher im Wiederherstellungs-Journal und werden beim
-  Beenden, Absturz oder `--restore` zurückgenommen. In die Registry schreibt tomodachi nichts.
+  Beenden, Absturz oder `--restore` zurückgenommen. tomodachi selbst schreibt nichts in die Registry
+  (Windows speichert wie immer die Taskleisten-Einstellung und die Autostart-Aufgabe).
 - **Deine Daten bleiben lokal:** in `%APPDATA%\tomodachi` und `%LOCALAPPDATA%\tomodachi`.
 - **Die Exe unter Releases baut GitHub selbst** aus genau diesem Quellcode.
 
