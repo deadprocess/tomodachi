@@ -35,6 +35,11 @@ Die Oberfläche ist auf Deutsch oder Englisch, je nach Windows-Sprache oder fest
   gehen unverändert durch und werden nie gespeichert oder verschickt, auch nicht im Log.
 - **Adminrechte sind optional:** Sie dienen nur dazu, dass die Win-Taste auch über Admin-Fenstern und Spielen mit
   Anti-Cheat funktioniert. Apps aus dem Launcher starten ohne Adminrechte, außer du wählst „Als Administrator starten“.
+  Die Autostart-Aufgabe läuft mit Adminrechten, deshalb schließt tomodachi die Wege, auf denen fremder Code mitfahren
+  könnte: Exe und DLLs nur aus dem Installationsordner (nichts in `%TEMP%`), ein kleiner `cmd`-Schritt leert vor dem
+  Start die `CORECLR_*`-, `COR_*`- und codeladenden `DOTNET_*`-Umgebungsvariablen, die Aufgabe wird ohne Temp-Datei
+  angelegt, und das Einschalten aus einem für Nicht-Admins beschreibbaren Ordner fragt nach. Das setzt voraus, dass der
+  Installationsordner selbst nur für Admins beschreibbar ist (daher `C:\Programme`).
 - **Alles umkehrbar:** Änderungen an der Taskleiste stehen vorher im Wiederherstellungs-Journal und werden beim
   Beenden, Absturz oder `--restore` zurückgenommen. tomodachi selbst schreibt nichts in die Registry
   (Windows speichert wie immer die Taskleisten-Einstellung und die Autostart-Aufgabe).

@@ -72,9 +72,12 @@ tomodachi hooks the keyboard and can run as admin, so here is exactly what it do
 - **Admin rights are optional.** They're only used so the Win key also works while an admin window or a game with
   anti-cheat is focused. They come from a Task Scheduler entry you enable in Settings and can remove any time.
   Apps you start from the launcher run *without* admin rights unless you pick *Run as administrator*.
-  So that no other program can sneak in through that entry: the exe and its DLLs come from the install folder only
-  (nothing is unpacked to `%TEMP%`), .NET startup hooks from environment variables are switched off, the task is
-  registered without a temporary file, and turning on autostart from a folder non-admins can change asks first.
+  That entry runs with admin rights, so tomodachi closes the ways another program could ride along: the exe and its
+  DLLs come from the install folder only (nothing is unpacked to `%TEMP%`); the task starts tomodachi through a small
+  `cmd` step that clears the `CORECLR_*`, `COR_*` and code-loading `DOTNET_*` environment variables Windows would
+  otherwise pass into the elevated process; the task is registered without a temporary file; and turning on autostart
+  from a folder non-admins can change asks first. This all assumes the install folder itself is admin-only (hence
+  `C:\Program Files`); a folder your account can change defeats it, which is what the warning is about.
 - **System changes are reversible.** It changes the taskbar (auto-hide, hidden windows), and, only when you ask,
   the autostart task, your wallpaper, volume, default output device and Wi-Fi/Bluetooth (quick settings change
   exactly what you click, like Windows' own quick settings would, and aren't undone on quit). Taskbar changes go to a restore journal first and are undone on quit,

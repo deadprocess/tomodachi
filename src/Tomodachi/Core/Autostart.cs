@@ -12,12 +12,27 @@ namespace Tomodachi.Core;
 /// Paket 1.4: eine Aufgabe in der Aufgabenplanung, die tomodachi bei der Anmeldung mit höchsten Rechten startet.
 /// Über <c>schtasks /Run</c> kann auch ein normaler Start ohne UAC-Abfrage auf die elevated Variante umsteigen.
 /// Elevated sieht der Tastatur-Hook auch Tasten, während ein Admin-Fenster den Fokus hat (UIPI).
+/// Die Aufgabe startet die Exe über cmd.exe, das zuvor die <see cref="RuntimeInjectionVars"/> leert (siehe <see cref="StarterArguments"/>).
 /// </summary>
 internal static class Autostart
 {
     private const string TaskName = "tomodachi";
     public const string FromTaskArgument = "--from-task";
     private const int ErrorCancelled = 1223;
+
+    /// <summary>
+    /// Umgebungsvariablen, über die die .NET-Runtime beim Start fremden Code (Profiler, zusätzliche Assemblies) in den
+    /// Prozess laden würde, noch bevor tomodachis eigener Code läuft. Die Aufgabe erbt <c>HKCU\Environment</c>, das jedes
+    /// Programm des Users setzen darf; sie würden also sonst mit Adminrechten geladen. Deshalb leert der cmd-Starter sie,
+    /// bevor er die (elevated) Exe startet. StartupHookSupport ist schon per csproj aus, hier zur Sicherheit noch einmal.
+    /// </summary>
+    private static readonly string[] RuntimeInjectionVars =
+    [
+        "CORECLR_ENABLE_PROFILING", "CORECLR_PROFILER", "CORECLR_PROFILER_PATH",
+        "CORECLR_PROFILER_PATH_32", "CORECLR_PROFILER_PATH_64",
+        "COR_ENABLE_PROFILING", "COR_PROFILER", "COR_PROFILER_PATH",
+        "DOTNET_STARTUP_HOOKS", "DOTNET_ADDITIONAL_DEPS", "DOTNET_SHARED_STORE",
+    ];
 
     static Autostart() => Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
@@ -83,8 +98,13 @@ internal static class Autostart
 
         try
         {
-            var command = XDocument.Parse(output).Descendants().FirstOrDefault(e => e.Name.LocalName == "Command")?.Value;
-            return string.Equals(command?.Trim('"'), Environment.ProcessPath, StringComparison.OrdinalIgnoreCase);
+            var exec = XDocument.Parse(output).Descendants().FirstOrDefault(e => e.Name.LocalName == "Exec");
+            var command = exec?.Elements().FirstOrDefault(e => e.Name.LocalName == "Command")?.Value ?? "";
+            var arguments = exec?.Elements().FirstOrDefault(e => e.Name.LocalName == "Arguments")?.Value ?? "";
+            var exe = Environment.ProcessPath;
+            // Alt: Command ist direkt die Exe. Neu: Command ist cmd.exe, die Exe steht in Quotes in den Argumenten.
+            return string.Equals(command.Trim('"'), exe, StringComparison.OrdinalIgnoreCase)
+                || arguments.Contains($"\"{exe}\"", StringComparison.OrdinalIgnoreCase);
         }
         catch (Exception ex)
         {
@@ -104,6 +124,9 @@ internal static class Autostart
     {
         var exe = Environment.ProcessPath!;
         var user = WindowsIdentity.GetCurrent().Name;
+
+        var cmd = Path.Combine(Environment.SystemDirectory, "cmd.exe");
+        var arguments = StarterArguments(exe);
         var xml = $"""
             <?xml version="1.0" encoding="UTF-16"?>
             <Task version="1.4" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
@@ -143,8 +166,8 @@ internal static class Autostart
               </Settings>
               <Actions Context="Author">
                 <Exec>
-                  <Command>"{SecurityElement.Escape(exe)}"</Command>
-                  <Arguments>{FromTaskArgument}</Arguments>
+                  <Command>{SecurityElement.Escape(cmd)}</Command>
+                  <Arguments>{SecurityElement.Escape(arguments)}</Arguments>
                   <WorkingDirectory>{SecurityElement.Escape(Path.GetDirectoryName(exe))}</WorkingDirectory>
                 </Exec>
               </Actions>
@@ -153,6 +176,18 @@ internal static class Autostart
         // Ohne Priority 4 läuft die Aufgabe mit „below normal“ (7), und die UI würde ruckeln
 
         return Register(xml);
+    }
+
+    /// <summary>
+    /// Argumente für cmd.exe: erst die <see cref="RuntimeInjectionVars"/> leeren, dann die Exe starten. Die Aufgabe ruft
+    /// nicht direkt die Exe, sondern cmd auf, damit diese Variablen nicht mit Adminrechten in den .NET-Prozess kommen.
+    /// „start“ löst die Exe von cmd, sodass cmd sofort endet (kurzes Konsolenblitzen beim Anmelden). „/d“ unterdrückt eine
+    /// AutoRun-Zeile aus HKCU, „/s“ nimmt den Rest wörtlich samt inneren Anführungszeichen.
+    /// </summary>
+    internal static string StarterArguments(string exe)
+    {
+        var scrub = string.Concat(RuntimeInjectionVars.Select(v => $"set \"{v}=\" & "));
+        return $"/d /s /c \"{scrub}start \"\" \"{exe}\" {FromTaskArgument}\"";
     }
 
     /// <summary>
