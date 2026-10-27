@@ -20,9 +20,15 @@ Also: Win+W opens the widgets, Win+Ctrl+W a wallpaper picker (images from the
 
 GETTING STARTED
 ---------------
-1. Move this folder to C:\Program Files\tomodachi (Windows asks for admin
-   rights once). Autostart starts tomodachi.exe from there with admin rights,
-   so it belongs in a folder only admins can change.
+1. Unzip straight into C:\Program Files\tomodachi or COPY this folder there
+   (Windows asks for admin rights once). Don't move it: a move keeps the old
+   file permissions from your Downloads folder, only newly written files get
+   the admin-only permissions of Program Files.
+   Autostart starts tomodachi.exe from there with admin rights, so it belongs
+   in a folder only admins can change.
+   Already moved it? Reset the permissions in an admin PowerShell:
+     icacls "C:\Program Files\tomodachi" /setowner Administrators /T /C
+     icacls "C:\Program Files\tomodachi" /reset /T /C
 2. Double-click tomodachi.exe.
    Windows may say "Windows protected your PC": the exe isn't signed.
    "More info" → "Run anyway".

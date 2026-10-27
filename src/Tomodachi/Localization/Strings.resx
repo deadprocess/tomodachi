@@ -112,7 +112,11 @@
 
 Autostart runs tomodachi with admin rights and without asking. Any program could swap the exe there and get admin rights the same way.
 
-Better: move the tomodachi folder to C:\Program Files first, then turn on autostart from there.
+{1}
 
 Set up autostart anyway?</value></data>
+  <data name="Autostart_UnsafeFolder_Move" xml:space="preserve"><value>Better: copy the tomodachi folder to C:\Program Files or unzip it there first (don't move it, a move keeps the old permissions), then turn on autostart from there.</value></data>
+  <data name="Autostart_UnsafeFolder_Reset" xml:space="preserve"><value>The folder is already under C:\Program Files, but the files still carry the permissions of the folder they were moved from. Better: reset them in an admin PowerShell, then turn on autostart:
+icacls "{0}" /setowner Administrators /T /C
+icacls "{0}" /reset /T /C</value></data>
 </root>

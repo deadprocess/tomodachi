@@ -89,7 +89,7 @@ internal static class Program
         if (!Elevation.IsElevated && !options.Safe)
             Log.Warn("Ohne Adminrechte sieht der Hook keine Tasten, solange ein Admin-Fenster den Fokus hat. Abhilfe: tomodachi --install");
         if (Elevation.IsElevated && Autostart.WritableByNonAdmins().Count > 0)
-            Log.Warn("Läuft elevated aus einem Ordner, den auch Programme ohne Adminrechte ändern dürfen. Abhilfe: nach Program Files verschieben, Autostart neu einrichten");
+            Log.Warn("Läuft elevated aus einem Ordner, den auch Programme ohne Adminrechte ändern dürfen. Abhilfe: nach Program Files kopieren (nicht verschieben) oder dort die Rechte zurücksetzen (icacls /reset), Autostart neu einrichten");
 
         if (!RestoreJournal.IsEmpty)
         {

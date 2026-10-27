@@ -20,9 +20,15 @@ Dazu: Win+W öffnet die Widgets, Win+Strg+W einen Wallpaper-Wechsler
 
 LOSLEGEN
 --------
-1. Den Ordner nach C:\Programme\tomodachi verschieben (fragt einmal nach
-   Adminrechten). Der Autostart startet tomodachi.exe von dort mit Adminrechten,
-   deshalb gehört sie in einen Ordner, den nur Admins ändern dürfen.
+1. Das ZIP direkt nach C:\Programme\tomodachi entpacken oder den Ordner
+   dorthin KOPIEREN (fragt einmal nach Adminrechten). Nicht verschieben:
+   Verschieben behält die alten Dateirechte aus dem Download-Ordner, nur neu
+   geschriebene Dateien bekommen die Admin-Rechte von C:\Programme.
+   Der Autostart startet tomodachi.exe von dort mit Adminrechten, deshalb
+   gehört sie in einen Ordner, den nur Admins ändern dürfen.
+   Schon verschoben? Rechte in einer Admin-PowerShell zurücksetzen:
+     icacls "C:\Programme\tomodachi" /setowner Administratoren /T /C
+     icacls "C:\Programme\tomodachi" /reset /T /C
 2. tomodachi.exe doppelklicken.
    Windows warnt evtl. „Der Computer wurde durch Windows geschützt“: Die Exe ist
    nicht signiert. „Weitere Informationen“ → „Trotzdem ausführen“.

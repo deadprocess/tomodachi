@@ -63,8 +63,14 @@ internal static class Autostart
         var problems = WritableByNonAdmins();
         if (problems.Count == 0) return true;
 
+        // Under Program Files the folder itself is fine and the files carry stale ACLs (typically from a move):
+        // advise a permission reset there, a copy to Program Files everywhere else.
+        var folder = Path.GetDirectoryName(Environment.ProcessPath!)!;
+        var advice = InstallFolder.IsUnderProgramFiles(folder)
+            ? Localization.Loc.Format("Autostart_UnsafeFolder_Reset", folder)
+            : Localization.Loc.Get("Autostart_UnsafeFolder_Move");
         var answer = System.Windows.MessageBox.Show(
-            Localization.Loc.Format("Autostart_UnsafeFolder", string.Join("\n", problems.Take(5))), "tomodachi",
+            Localization.Loc.Format("Autostart_UnsafeFolder", string.Join("\n", problems.Take(5)), advice), "tomodachi",
             System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Warning, System.Windows.MessageBoxResult.No);
         var confirmed = answer == System.Windows.MessageBoxResult.Yes;
         Log.Warn($"Autostart in beschreibbarem Ordner {(confirmed ? "trotzdem eingerichtet" : "abgebrochen")}");

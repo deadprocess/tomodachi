@@ -81,6 +81,22 @@ internal static class InstallFolder
 
     private static bool IsTrusted(SecurityIdentifier sid) => TrustedSids.Contains(sid);
 
+    /// <summary>True if <paramref name="folder"/> is Program Files (64- or 32-bit) or lies below it.</summary>
+    public static bool IsUnderProgramFiles(string folder)
+    {
+        var path = Path.TrimEndingDirectorySeparator(Path.GetFullPath(folder));
+        foreach (var special in new[] { Environment.SpecialFolder.ProgramFiles, Environment.SpecialFolder.ProgramFilesX86 })
+        {
+            var root = Environment.GetFolderPath(special);
+            if (string.IsNullOrEmpty(root)) continue;
+            root = Path.TrimEndingDirectorySeparator(Path.GetFullPath(root));
+            if (path.Equals(root, StringComparison.OrdinalIgnoreCase)
+                || path.StartsWith(root + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
+                return true;
+        }
+        return false;
+    }
+
     private static string Name(SecurityIdentifier sid)
     {
         try

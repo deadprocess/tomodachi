@@ -33,4 +33,26 @@ public class InstallFolderTests
 
         Assert.Empty(InstallFolder.FindWritable(exe));
     }
+
+    [Fact]
+    public void IsUnderProgramFiles_MatchesProgramFilesAndSubfolders()
+    {
+        var programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+
+        Assert.True(InstallFolder.IsUnderProgramFiles(programFiles));
+        Assert.True(InstallFolder.IsUnderProgramFiles(programFiles + @"\"));
+        Assert.True(InstallFolder.IsUnderProgramFiles(Path.Combine(programFiles, "tomodachi-1.6.0")));
+        Assert.True(InstallFolder.IsUnderProgramFiles(Path.Combine(programFiles, "tomodachi", "dist", "tomodachi-1.6.1")));
+        Assert.True(InstallFolder.IsUnderProgramFiles(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "tomodachi")));
+    }
+
+    [Fact]
+    public void IsUnderProgramFiles_RejectsLookalikesAndOtherFolders()
+    {
+        var programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+
+        Assert.False(InstallFolder.IsUnderProgramFiles(programFiles + "-fake"));
+        Assert.False(InstallFolder.IsUnderProgramFiles(Path.GetTempPath()));
+        Assert.False(InstallFolder.IsUnderProgramFiles(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads", "tomodachi")));
+    }
 }

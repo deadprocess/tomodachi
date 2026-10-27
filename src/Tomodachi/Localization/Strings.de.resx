@@ -112,7 +112,11 @@
 
 Der Autostart startet tomodachi ohne Nachfrage mit Adminrechten. Jedes Programm könnte dort die Exe austauschen und käme so ebenfalls an Adminrechte.
 
-Besser: den tomodachi-Ordner erst nach C:\Programme (C:\Program Files) verschieben und den Autostart von dort einschalten.
+{1}
 
 Trotzdem einrichten?</value></data>
+  <data name="Autostart_UnsafeFolder_Move" xml:space="preserve"><value>Besser: den tomodachi-Ordner erst nach C:\Programme (C:\Program Files) kopieren oder das ZIP dort entpacken (nicht verschieben, das behält die alten Rechte) und den Autostart von dort einschalten.</value></data>
+  <data name="Autostart_UnsafeFolder_Reset" xml:space="preserve"><value>Der Ordner liegt schon unter C:\Programme, aber die Dateien haben noch die Rechte des Ordners, aus dem sie verschoben wurden. Besser: in einer Admin-PowerShell die Rechte zurücksetzen und den Autostart danach einschalten:
+icacls "{0}" /setowner Administratoren /T /C
+icacls "{0}" /reset /T /C</value></data>
 </root>

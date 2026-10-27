@@ -29,9 +29,17 @@ The UI is available in English and German (follows Windows, or pick one in Setti
 
 ## Install
 
-1. Download `tomodachi-<version>.zip` from [Releases](../../releases) and unzip it to `C:\Program Files\tomodachi`
-   (Windows asks for admin rights once). Autostart remembers the path and starts that exe with admin rights, so it
-   belongs in a folder only admins can change. tomodachi warns when you turn on autostart from anywhere else.
+1. Download `tomodachi-<version>.zip` from [Releases](../../releases) and unzip it straight into
+   `C:\Program Files\tomodachi` (Windows asks for admin rights once). Autostart remembers the path and starts that exe
+   with admin rights, so it belongs in a folder only admins can change. tomodachi warns when you turn on autostart from
+   anywhere else. Unzip or copy, don't move: a move within the same drive keeps the file permissions of the source
+   folder, and tomodachi will warn even though the path says Program Files. If that happened, reset them from an admin
+   PowerShell:
+
+   ```powershell
+   icacls "C:\Program Files\tomodachi" /setowner Administrators /T /C
+   icacls "C:\Program Files\tomodachi" /reset /T /C
+   ```
 2. Run `tomodachi.exe`. Windows SmartScreen will warn because the exe isn't signed: *More info → Run anyway*.
 3. Open Settings (⚙) and turn on **Start with Windows**. It asks for admin rights once. Then press **Restart** in Settings
    (or sign in again): from now on tomodachi runs with admin rights, and only then does the Win key also work while an
