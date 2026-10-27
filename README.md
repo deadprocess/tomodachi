@@ -58,39 +58,82 @@ To uninstall: Settings â†’ turn off **Start with Windows** (or `--uninstall`) â†
 
 ## Security & privacy
 
-tomodachi hooks the keyboard and can run as admin, so here is exactly what it does with that:
+tomodachi reads every keystroke and can run with admin rights. That deserves a clear answer to "what does it do with
+that?", so here it is. Short version first:
 
-- **No network.** tomodachi's own code opens no network connections: no telemetry, no update checks, no accounts.
-  The network widget only reads your adapter's traffic counters. (Checked on a running instance: 0 TCP, 0 UDP.)
-  The Wi-Fi list asks Windows to scan and, when you click a network, to connect; Windows does that, not tomodachi.
-- **Keyboard: it sees every key, it uses only the Win key.** That's how keyboard hooks work: a low-level hook and a
-  raw-input listener both receive every keystroke. The code only acts on the Win key (plus Win+W, Win+L, Ctrl+Esc,
-  and Esc while the notch is open); while Win is held, other keys are only checked to tell a combo from a tap.
-  Every other key passes through unchanged and is never stored or sent anywhere. Even the debug log only records
-  "other key", never which one. To work, tomodachi injects a few keys of its own: F24 (opens the notch), an unused
-  key code (stops the Start menu), and a replayed Win-down before a combo.
-- **Admin rights are optional.** They're only used so the Win key also works while an admin window or a game with
-  anti-cheat is focused. They come from a Task Scheduler entry you enable in Settings and can remove any time.
-  Apps you start from the launcher run *without* admin rights unless you pick *Run as administrator*.
-  That entry runs with admin rights, so tomodachi closes the ways another program could ride along: the exe and its
-  DLLs come from the install folder only (nothing is unpacked to `%TEMP%`); the task starts tomodachi through a small
-  `cmd` step that clears the `CORECLR_*`, `COR_*` and code-loading `DOTNET_*` environment variables Windows would
-  otherwise pass into the elevated process; the task is registered without a temporary file; and turning on autostart
-  from a folder non-admins can change asks first. This all assumes the install folder itself is admin-only (hence
-  `C:\Program Files`); a folder your account can change defeats it, which is what the warning is about.
-- **System changes are reversible.** It changes the taskbar (auto-hide, hidden windows), and, only when you ask,
-  the autostart task, your wallpaper, volume, default output device and Wi-Fi/Bluetooth (quick settings change
-  exactly what you click, like Windows' own quick settings would, and aren't undone on quit). Taskbar changes go to a restore journal first and are undone on quit,
-  crash, sign-out or `--restore`. tomodachi's code reads two registry values (Steam's path, the fast-startup flag) and
-  writes none; Windows itself stores the taskbar's auto-hide setting and the scheduled task, as it always does.
-- **Your data stays local.** Settings, logs, launch history (which apps you start, for ranking), the restore journal
-  and your profile picture live in `%APPDATA%\tomodachi`, the icon cache in `%LOCALAPPDATA%\tomodachi`.
-  Delete both and it's gone.
-- **The release is built from this source.** The exe in [Releases](../../releases) is built by GitHub Actions from
-  this repository ([workflow](.github/workflows/build.yml)), not on my PC. You can also build it yourself.
+| | |
+|---|---|
+| **Network** | None. No telemetry, no update checks, no accounts. |
+| **Keyboard** | Sees every key, reacts only to the Win key. Nothing is stored or sent. |
+| **Admin rights** | Optional, off by default, removable any time. |
+| **System changes** | Taskbar changes are undone when it quits. Everything else only happens when you click it. |
+| **Your data** | Two local folders. Delete them and it's gone. |
+| **The download** | Built by GitHub Actions from this source, not on my PC. |
 
-The code was written by an AI and I haven't reviewed it, as said at the top. Everything above was checked against
-the code, but if you need certainty, read [`src/`](src) or build from source.
+### No network
+
+tomodachi's own code never opens a network connection. The network widget only reads the traffic counters of your
+adapter. The Wi-Fi list asks Windows to scan, and when you click a network, asks Windows to connect; Windows does
+the connecting, not tomodachi. (Checked on a running instance: 0 TCP and 0 UDP connections.)
+
+### Keyboard
+
+A keyboard hook receives every keystroke; that's simply how hooks work. tomodachi acts only on the Win key and a
+handful of combos (Win+W, Win+L, Ctrl+Esc, and Esc while the notch is open). While Win is held, other keys are
+checked just to tell a combo from a tap. Every other key passes through unchanged and is never stored or sent
+anywhere. Even the debug log only notes "other key", never which one.
+
+tomodachi also sends a few keys of its own: F24 to open the notch, an unused key code to stop the Start menu from
+appearing, and a replayed Win-down before a combo.
+
+### Admin rights
+
+Admin rights exist for one reason: so the Win key keeps working while an admin window or a game with anti-cheat has
+focus. You get them by turning on **Start with Windows** in Settings, which creates a Task Scheduler entry. Turn it
+off and the entry is gone. Apps you launch from tomodachi run *without* admin rights unless you choose
+*Run as administrator*.
+
+Because that task runs elevated, tomodachi closes the usual ways another program could ride along with it. These
+protections assume the install folder is admin-only, which is why [Install](#install) says `C:\Program Files`.
+If your account can write to the install folder, the protection is void; that is what the warning when turning on
+autostart is about.
+
+<details>
+<summary>What exactly is hardened</summary>
+
+- The exe and its DLLs load from the install folder only; nothing is unpacked to `%TEMP%`.
+- The task starts tomodachi through a small `cmd` step that clears the `CORECLR_*`, `COR_*` and code-loading
+  `DOTNET_*` environment variables, which Windows would otherwise pass into the elevated process.
+- The task is registered directly, without a temporary file.
+- Turning on autostart from a folder non-admins can change asks for confirmation first.
+
+</details>
+
+### System changes
+
+Taskbar changes (auto-hide, hidden windows) are written to a restore journal before they happen and are undone on
+quit, crash, sign-out, or with `--restore`.
+
+Everything else changes only when you click it: the autostart task, your wallpaper, volume, default output device,
+Wi-Fi and Bluetooth. These behave like Windows' own quick settings: they change exactly what you clicked and are
+not undone on quit.
+
+tomodachi reads two registry values (Steam's path and the fast-startup flag) and writes none. Windows itself stores
+the taskbar's auto-hide setting and the scheduled task, as it always does.
+
+### Your data stays local
+
+Settings, logs, launch history (which apps you start, used for ranking), the restore journal and your profile
+picture live in `%APPDATA%\tomodachi`; the icon cache lives in `%LOCALAPPDATA%\tomodachi`. Delete both folders
+and nothing is left. See [Files](#files) for what each file holds.
+
+### The download matches the source
+
+The exe in [Releases](../../releases) is built by GitHub Actions from this repository
+([workflow](.github/workflows/build.yml)), not on my PC. You can also [build it yourself](#build).
+
+As said at the top, the code was written by an AI and I haven't reviewed it. Everything in this section was checked
+against the code, but if you need certainty, read [`src/`](src) or build from source.
 
 ## Build
 
