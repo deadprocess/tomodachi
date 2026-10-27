@@ -27,6 +27,9 @@ internal sealed class TomodachiConfig
     /// <summary>Notch auch über maximierten Fenstern verstecken, nicht nur bei Vollbild (Spiel, Video).</summary>
     public bool HideOnMaximized { get; set; } = true;
 
+    /// <summary>„Leiste mit Notch“ (true) oder „Nur Notch“: Leiste oben über die ganze Breite des Notch-Monitors, mit den offenen Fenstern als Tabs.</summary>
+    public bool ShowTopBar { get; set; } = true;
+
     /// <summary>Rechtsklick im Fenster-Reiter bietet „Task beenden“ an (Prozess sofort beenden). Wie bei Windows standardmäßig aus.</summary>
     public bool EnableEndTask { get; set; }
 

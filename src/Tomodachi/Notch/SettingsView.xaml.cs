@@ -47,6 +47,8 @@ public partial class SettingsView : UserControl
         _syncing = true;
         HideOnMaximized.IsChecked = _config.HideOnMaximized;
         EnableEndTask.IsChecked = _config.EnableEndTask;
+        StyleBar.IsChecked = _config.ShowTopBar;
+        StyleNotch.IsChecked = !_config.ShowTopBar;
         InterceptWinKey.IsChecked = _config.InterceptWinKey;
         HideTaskbar.IsChecked = _config.HideTaskbar;
         LanguageAuto.IsChecked = _config.Language is not ("de" or "en");
@@ -114,6 +116,16 @@ public partial class SettingsView : UserControl
         if (sender is not RadioButton { Tag: string spec } || spec == _config.NotchMonitor) return;
         _config.NotchMonitor = spec;
         SettingChanged?.Invoke(nameof(TomodachiConfig.NotchMonitor));
+    }
+
+    /// <summary>„Leiste mit Notch“ oder „Nur Notch“. Wirkt sofort: Leiste an- bzw. abmelden, Notch wölbt sich heraus bzw. nicht.</summary>
+    private void OnStyleChosen(object sender, RoutedEventArgs e)
+    {
+        if (_syncing || sender is not RadioButton { Tag: string style }) return;
+        var bar = style == "bar";
+        if (bar == _config.ShowTopBar) return;
+        _config.ShowTopBar = bar;
+        SettingChanged?.Invoke(nameof(TomodachiConfig.ShowTopBar));
     }
 
     private void OnLanguageChosen(object sender, RoutedEventArgs e)

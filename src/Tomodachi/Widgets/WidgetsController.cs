@@ -1,5 +1,7 @@
+using System.Diagnostics;
 using System.IO;
 using System.Windows.Threading;
+using Tomodachi.Core;
 
 namespace Tomodachi.Widgets;
 
@@ -13,6 +15,8 @@ internal sealed class WidgetsController
     private readonly NetworkService _network = new();
     private readonly MediaService _media;
     private readonly WindowListService _windowList = new();
+    private readonly AudioService _audio = new();
+    private readonly RadioService _radios = new();
     private readonly DispatcherTimer _timer;
     private int _tick;
 
@@ -23,9 +27,12 @@ internal sealed class WidgetsController
         _media = new MediaService(appName);
         _timer = new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Background, (_, _) => Refresh(),
             Dispatcher.CurrentDispatcher);
+        ViewModel.Quick.VolumeRequested += _audio.SetVolume;
     }
 
     public WidgetViewModel ViewModel { get; } = new();
+
+    private QuickSettingsViewModel Quick => ViewModel.Quick;
 
     public bool IsRunning => _timer.IsEnabled;
 
@@ -37,7 +44,12 @@ internal sealed class WidgetsController
         _timer.Start();
     }
 
-    public void Stop() => _timer.Stop();
+    public void Stop()
+    {
+        _timer.Stop();
+        Quick.ShowDevices = false;
+        Quick.ShowNetworks = false;
+    }
 
     public async Task MediaAsync(Func<MediaService, Task> command)
     {
@@ -46,21 +58,80 @@ internal sealed class WidgetsController
         ViewModel.UpdateMedia(await _media.PollAsync());
     }
 
-    /// <summary>Uhr, Netzwerk und Sensoren jede Sekunde, Media und Fenster alle 2 s, Laufwerke alle 5 s.</summary>
+    public void ToggleMute()
+    {
+        _audio.SetMuted(!Quick.Muted);
+        Quick.UpdateAudio(_audio.Poll());
+    }
+
+    public void ToggleDevices()
+    {
+        Quick.ShowDevices = !Quick.ShowDevices;
+        if (Quick.ShowDevices) RefreshDevices();
+    }
+
+    public void SetDefaultDevice(string deviceId)
+    {
+        _audio.SetDefault(deviceId);
+        Quick.UpdateAudio(_audio.Poll());
+        RefreshDevices();
+        Quick.ShowDevices = false;
+    }
+
+    public async Task ToggleRadioAsync(bool wifi)
+    {
+        await _radios.SetAsync(wifi, !(wifi ? Quick.WifiOn : Quick.BluetoothOn));
+        Quick.UpdateRadios(await _radios.PollAsync());
+    }
+
+    public async Task ToggleNetworksAsync()
+    {
+        Quick.ShowNetworks = !Quick.ShowNetworks;
+        if (Quick.ShowNetworks) Quick.UpdateNetworks(await _radios.ScanAsync());
+    }
+
+    /// <summary>Unbekanntes Netz mit Passwort: Die WLAN-Einstellungen von Windows übernehmen das Eintippen.</summary>
+    public async Task ConnectAsync(string ssid)
+    {
+        if (await _radios.ConnectAsync(ssid))
+        {
+            Quick.UpdateNetworks(await _radios.ScanAsync());
+            return;
+        }
+        Process.Start(new ProcessStartInfo("explorer.exe", "ms-settings:network-wifi") { UseShellExecute = false })?.Dispose();
+    }
+
+    /// <summary>
+    /// Uhr, Netzwerk, Sensoren und Lautstärke jede Sekunde, Media, Fenster und Funk alle 2 s, Laufwerke und
+    /// Audiogeräte alle 5 s, WLAN-Liste (nur offen) alle 10 s.
+    /// </summary>
     private async void Refresh()
     {
         var tick = _tick++;
         ViewModel.UpdateClock(DateTime.Now);
         ViewModel.UpdateNetwork(_network.Poll());
+        Quick.UpdateAudio(_audio.Poll());
 
         if (tick % 2 == 0)
         {
             ViewModel.UpdateWindows(_windowList.Snapshot(), _windowList.Icon);
             ViewModel.UpdateMedia(await _media.PollAsync());
+            Quick.UpdateRadios(await _radios.PollAsync());
         }
-        if (tick % 5 == 0) ViewModel.UpdateVolumes(ReadVolumes());
+        if (tick % 5 == 0)
+        {
+            ViewModel.UpdateVolumes(ReadVolumes());
+            if (Quick.ShowDevices) RefreshDevices();
+        }
+        if (tick % 10 == 0 && Quick.ShowNetworks) Quick.UpdateNetworks(await _radios.ScanAsync());
 
         ViewModel.UpdateSystem(await _sensors.PollAsync());
+    }
+
+    private void RefreshDevices()
+    {
+        var state = _audio.Poll();
+        Quick.UpdateDevices(_audio.Devices(), state?.DeviceId ?? "");
     }
 
     private static IEnumerable<(string, string, long, long)> ReadVolumes()

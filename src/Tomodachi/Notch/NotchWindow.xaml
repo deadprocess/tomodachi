@@ -58,13 +58,13 @@
                                        Width="608" Height="406" Margin="0,48,0,0"
                                        HorizontalAlignment="Center" VerticalAlignment="Top" />
                 <widgets:WidgetsView x:Name="Widgets" Visibility="Collapsed" Opacity="0"
-                                     Width="928" Height="406" Margin="0,48,0,0"
+                                     Width="928" Height="526" Margin="0,48,0,0"
                                      HorizontalAlignment="Center" VerticalAlignment="Top" />
                 <widgets:WindowsView x:Name="Windows" Visibility="Collapsed" Opacity="0"
                                      Width="608" Height="406" Margin="0,48,0,0"
                                      HorizontalAlignment="Center" VerticalAlignment="Top" />
                 <notch:SettingsView x:Name="Settings" Visibility="Collapsed" Opacity="0"
-                                    Width="608" Height="514" Margin="0,48,0,0"
+                                    Width="608" Height="558" Margin="0,48,0,0"
                                     HorizontalAlignment="Center" VerticalAlignment="Top" />
                 <notch:PowerView x:Name="Power" Visibility="Collapsed" Opacity="0"
                                  Width="608" Margin="0,48,0,0"

@@ -64,6 +64,9 @@ internal sealed unsafe class WindowListService
 
     public static void Close(nint hwnd) => Native.PostMessage(hwnd, Native.WM_CLOSE, 0, 0);
 
+    /// <summary>Wie ein Klick auf den aktiven Taskleisten-Knopf.</summary>
+    public static void Minimize(nint hwnd) => Native.ShowWindowAsync(hwnd, Native.SW_MINIMIZE);
+
     /// <summary>
     /// Nicht beim Datei-Explorer (gleicher Prozess wie Desktop und Shell), nicht bei tomodachi selbst,
     /// und nicht, wenn sich der Prozess hinter dem Fenster nicht sicher bestimmen lässt.

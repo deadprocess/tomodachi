@@ -120,6 +120,23 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="{loc:Tr Settings_Style}" Style="{StaticResource Title}" />
+                    <TextBlock Text="{loc:Tr Settings_StyleHint}" Style="{StaticResource Hint}" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <RadioButton x:Name="StyleBar" Style="{StaticResource TabButton}" GroupName="NotchStyle" Tag="bar"
+                                 Content="{loc:Tr Settings_StyleBar}" Checked="OnStyleChosen" />
+                    <RadioButton x:Name="StyleNotch" Style="{StaticResource TabButton}" GroupName="NotchStyle" Tag="notch"
+                                 Content="{loc:Tr Settings_StyleNotch}" Checked="OnStyleChosen" />
+                </StackPanel>
+            </Grid>
+
+            <Grid Style="{StaticResource Row}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel VerticalAlignment="Center">
                     <TextBlock Text="{loc:Tr Settings_Language}" Style="{StaticResource Title}" />
                     <TextBlock Text="{loc:Tr Settings_LanguageHint}" Style="{StaticResource Hint}" />
                 </StackPanel>

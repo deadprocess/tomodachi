@@ -160,8 +160,146 @@
             </Border>
         </StackPanel>
 
-        <!-- ===== Spalte 3: System (4.3) + Netzwerk (4.5) ===== -->
-        <StackPanel Grid.Column="4">
+        <!-- ===== Spalte 3: Schnelleinstellungen + System (4.3) + Netzwerk (4.5) ===== -->
+        <!-- Scrollbar unsichtbar: Nur mit aufgeklappter WLAN-Liste (Laptops) wird die Spalte länger als der Reiter -->
+        <ScrollViewer Grid.Column="4" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+        <StackPanel>
+            <Border Style="{StaticResource Card}">
+                <StackPanel DataContext="{Binding Quick}">
+                    <TextBlock Text="{loc:Tr Widgets_Quick}" Style="{StaticResource CardHeader}" />
+
+                    <!-- WLAN / Bluetooth: nur mit passender Hardware -->
+                    <Grid Margin="0,0,0,10" Visibility="{Binding HasRadios, Converter={StaticResource BoolToVisibility}}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Button Style="{StaticResource QuickTile}" Tag="{Binding WifiOn}" Click="OnWifi"
+                                Visibility="{Binding HasWifi, Converter={StaticResource BoolToVisibility}}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE701;" FontFamily="{StaticResource IconFont}" FontSize="15" VerticalAlignment="Center" />
+                                <TextBlock Text="{loc:Tr Net_WiFi}" FontSize="12.5" Margin="8,0,0,0" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+                        <Button Grid.Column="1" Style="{StaticResource QuickTile}" Tag="{Binding BluetoothOn}" Click="OnBluetooth" Margin="0"
+                                Visibility="{Binding HasBluetooth, Converter={StaticResource BoolToVisibility}}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE702;" FontFamily="{StaticResource IconFont}" FontSize="15" VerticalAlignment="Center" />
+                                <TextBlock Text="{loc:Tr Quick_Bluetooth}" FontSize="12.5" Margin="8,0,0,0" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+
+                    <!-- WLAN-Netze -->
+                    <StackPanel Visibility="{Binding WifiOn, Converter={StaticResource BoolToVisibility}}" Margin="0,0,0,6">
+                        <Button Style="{StaticResource RowButton}" Click="OnNetworks">
+                            <Grid>
+                                <TextBlock Text="{loc:Tr Quick_Networks}" FontSize="12.5" />
+                                <TextBlock Text="&#xE76C;" FontFamily="{StaticResource IconFont}" FontSize="11" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                            </Grid>
+                        </Button>
+                        <StackPanel Visibility="{Binding ShowNetworks, Converter={StaticResource BoolToVisibility}}">
+                            <TextBlock Text="{loc:Tr Quick_NoNetworks}" Style="{StaticResource Muted}" FontSize="11" TextWrapping="Wrap" Margin="8,2,8,4"
+                                       Visibility="{Binding NoNetworks, Converter={StaticResource BoolToVisibility}}" />
+                            <ItemsControl ItemsSource="{Binding Networks}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type widgets:WifiNetworkItem}">
+                                        <Button Style="{StaticResource RowButton}" Tag="{Binding Ssid}" Click="OnNetworkClicked">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{Binding SignalIcon}" FontFamily="{StaticResource IconFont}" FontSize="13" VerticalAlignment="Center" />
+                                                <TextBlock Grid.Column="1" Text="{Binding Ssid}" FontSize="12.5" Margin="8,0" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                                                <TextBlock x:Name="State" Grid.Column="2" FontFamily="{StaticResource IconFont}" FontSize="11"
+                                                           Foreground="{StaticResource TextMutedBrush}" VerticalAlignment="Center" />
+                                            </Grid>
+                                        </Button>
+                                        <DataTemplate.Triggers>
+                                            <DataTrigger Binding="{Binding Secured}" Value="True">
+                                                <Setter TargetName="State" Property="Text" Value="&#xE72E;" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Connected}" Value="True">
+                                                <Setter TargetName="State" Property="Text" Value="&#xE73E;" />
+                                                <Setter TargetName="State" Property="Foreground" Value="{StaticResource AccentBrush}" />
+                                            </DataTrigger>
+                                        </DataTemplate.Triggers>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Lautstärke: Lautsprecher-Knopf = Stumm, Regler, Prozent -->
+                    <Grid Visibility="{Binding HasAudio, Converter={StaticResource BoolToVisibility}}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="42" />
+                        </Grid.ColumnDefinitions>
+                        <Button Style="{StaticResource IconButton}" Width="30" Height="30" FontSize="14" Click="OnMute" ToolTip="{loc:Tr Quick_Mute}">
+                            <TextBlock>
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Text" Value="&#xE767;" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Muted}" Value="True">
+                                                <Setter Property="Text" Value="&#xE74F;" />
+                                                <Setter Property="Foreground" Value="{StaticResource DangerBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Button>
+                        <Slider Grid.Column="1" Style="{StaticResource VolumeSlider}" Margin="6,0" VerticalAlignment="Center"
+                                Value="{Binding Volume, Mode=TwoWay}" />
+                        <TextBlock Grid.Column="2" Text="{Binding VolumeText}" Style="{StaticResource Value}" VerticalAlignment="Center" />
+                    </Grid>
+
+                    <!-- Ausgabegerät: Klick klappt die Liste auf -->
+                    <StackPanel Visibility="{Binding HasAudio, Converter={StaticResource BoolToVisibility}}" Margin="0,6,0,0">
+                        <Button Style="{StaticResource RowButton}" Click="OnDevices">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="&#xE7F5;" FontFamily="{StaticResource IconFont}" FontSize="13" VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="1" Text="{Binding DeviceName}" FontSize="12.5" Margin="8,0" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="2" Text="&#xE70D;" FontFamily="{StaticResource IconFont}" FontSize="10" VerticalAlignment="Center" />
+                            </Grid>
+                        </Button>
+                        <ItemsControl ItemsSource="{Binding Devices}" Margin="16,0,0,0"
+                                      Visibility="{Binding ShowDevices, Converter={StaticResource BoolToVisibility}}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="{x:Type widgets:AudioDeviceItem}">
+                                    <Button Style="{StaticResource RowButton}" Tag="{Binding Id}" Click="OnDeviceClicked">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="{Binding Name}" FontSize="12" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                                            <TextBlock x:Name="Check" Grid.Column="1" Text="&#xE73E;" FontFamily="{StaticResource IconFont}" FontSize="11"
+                                                       Foreground="{StaticResource AccentBrush}" Margin="6,0,0,0" VerticalAlignment="Center" Visibility="Hidden" />
+                                        </Grid>
+                                    </Button>
+                                    <DataTemplate.Triggers>
+                                        <DataTrigger Binding="{Binding IsDefault}" Value="True">
+                                            <Setter TargetName="Check" Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
             <Border Style="{StaticResource Card}">
                 <StackPanel>
                     <TextBlock Text="{loc:Tr Widgets_System}" Style="{StaticResource CardHeader}" />
@@ -214,5 +352,6 @@
                 </StackPanel>
             </Border>
         </StackPanel>
+        </ScrollViewer>
     </Grid>
 </UserControl>

@@ -5,14 +5,7 @@
              xmlns:widgets="clr-namespace:Tomodachi.Widgets"
              FontFamily="{StaticResource UiFont}">
     <!-- Fenster-Reiter der Notch (5.3): offene Fenster wie in Alt+Tab. DataContext = WidgetViewModel. -->
-    <UserControl.Resources>
-        <!-- Rechtsklick auf ein Fenster. „Task beenden“ nur, wenn in den Einstellungen eingeschaltet. -->
-        <ContextMenu x:Key="WindowMenu" Style="{StaticResource NotchContextMenu}">
-            <MenuItem Header="{loc:Tr Windows_BringToFront}" Tag="&#xE8A7;" Click="OnMenuActivate" />
-            <MenuItem Header="{loc:Tr Windows_Close}" Tag="&#xE8BB;" Click="OnMenuClose" />
-            <MenuItem Header="{loc:Tr Windows_EndTask}" Tag="&#xE71A;" Click="OnMenuEndTask" />
-        </ContextMenu>
-    </UserControl.Resources>
+    <!-- Rechtsklick: WindowMenu (gemeinsam mit der Fensterleiste) -->
     <ScrollViewer VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled" Focusable="False">
         <ItemsControl ItemsSource="{Binding Windows}">
             <ItemsControl.ItemTemplate>

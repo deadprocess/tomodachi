@@ -34,6 +34,11 @@
   <data name="Widgets_System" xml:space="preserve"><value>SYSTEM</value></data>
   <data name="Widgets_Memory" xml:space="preserve"><value>Arbeitsspeicher</value></data>
   <data name="Widgets_Network" xml:space="preserve"><value>NETZWERK</value></data>
+  <data name="Widgets_Quick" xml:space="preserve"><value>SCHNELLEINSTELLUNGEN</value></data>
+  <data name="Quick_Bluetooth" xml:space="preserve"><value>Bluetooth</value></data>
+  <data name="Quick_Networks" xml:space="preserve"><value>Netzwerke</value></data>
+  <data name="Quick_NoNetworks" xml:space="preserve"><value>Keine Netze gefunden. Evtl. braucht es Standortzugriff für Desktop-Apps (Einstellungen › Datenschutz › Position).</value></data>
+  <data name="Quick_Mute" xml:space="preserve"><value>Stumm</value></data>
   <data name="Widgets_Offline" xml:space="preserve"><value>Keine Verbindung</value></data>
   <data name="Net_WiFi" xml:space="preserve"><value>WLAN</value></data>
 
@@ -71,6 +76,10 @@
   <data name="Settings_HideOnMaximizedHint" xml:space="preserve"><value>Aus: nur bei Vollbild (Spiele, Videos)</value></data>
   <data name="Settings_EndTask" xml:space="preserve"><value>„Task beenden“ im Fenster-Reiter</value></data>
   <data name="Settings_EndTaskHint" xml:space="preserve"><value>Rechtsklick auf ein Fenster beendet die App sofort, Ungespeichertes ist weg</value></data>
+  <data name="Settings_Style" xml:space="preserve"><value>Oben am Bildschirm</value></data>
+  <data name="Settings_StyleHint" xml:space="preserve"><value>Leiste mit Fenster-Tabs, beide verschwinden bei maximierten Fenstern</value></data>
+  <data name="Settings_StyleBar" xml:space="preserve"><value>Leiste mit Notch</value></data>
+  <data name="Settings_StyleNotch" xml:space="preserve"><value>Nur Notch</value></data>
   <data name="Settings_WinKey" xml:space="preserve"><value>Win-Taste öffnet tomodachi</value></data>
   <data name="Settings_WinKeyHint" xml:space="preserve"><value>statt des Startmenüs · wirkt nach Neustart</value></data>
   <data name="Settings_HideTaskbar" xml:space="preserve"><value>Taskleiste ausblenden</value></data>

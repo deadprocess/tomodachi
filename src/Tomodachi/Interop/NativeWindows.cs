@@ -18,6 +18,7 @@ internal static unsafe partial class Native
     public const uint GW_HWNDNEXT = 2;
     public const uint GW_OWNER = 4;
     public const int SW_RESTORE = 9;
+    public const int SW_MINIMIZE = 6;
     public const uint WM_CLOSE = 0x0010;
     public const uint WM_GETICON = 0x007F;
     public const nuint ICON_BIG = 1;

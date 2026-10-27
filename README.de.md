@@ -1,8 +1,10 @@
 # tomodachi (Deutsch)
 
 Eine Shell für Windows im Stil von [Noctalia](https://github.com/noctalia-dev/noctalia): Startmenü und Taskleiste
-weichen einer Notch oben am Bildschirm. Ein Tipp auf die Win-Taste klappt sie auf: App-Starter, Widgets, Fensterliste,
-Einstellungen und Powermenü. Die ausführliche Beschreibung steht in der [englischen README](README.md).
+weichen einer schmalen Leiste oben am Bildschirm, mit den offenen Fenstern als Tabs und einer Notch, die aus ihrer Mitte
+fließt. Ein Tipp auf die Win-Taste klappt die Notch auf: App-Starter, Widgets mit Schnelleinstellungen (Lautstärke,
+Ausgabegerät, WLAN, Bluetooth), Fensterliste, Einstellungen und Powermenü. Wer nur die Notch will: Einstellungen →
+*Nur Notch*. Die ausführliche Beschreibung steht in der [englischen README](README.md).
 
 > **Zum Projekt.** tomodachi wurde komplett von einer KI (Claude von Anthropic) im Gespräch mit mir programmiert.
 > Ich habe entschieden, was es können und wie es sich anfühlen soll, jede Version auf meinem PC getestet und Fehler

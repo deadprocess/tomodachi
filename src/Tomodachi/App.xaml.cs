@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Windows;
+using Tomodachi.Bar;
 using Tomodachi.Core;
 using Tomodachi.Input;
 using Tomodachi.Interop;
@@ -27,6 +28,7 @@ public partial class App : Application
     private AppIndex? _appIndex;
     private SensorService? _sensors;
     private WallpaperPicker? _wallpaper;
+    private WindowBar? _bar;
     private TomodachiConfig _config = new();
 
     internal App(StartupOptions options, SingleInstance instance)
@@ -101,8 +103,16 @@ public partial class App : Application
         _wallpaper = CreateWallpaperPicker();
         _instance.Listen(ShellCommands.ToggleWallpaper, () => Dispatcher.BeginInvoke(() => _wallpaper?.Toggle()));
 
+        _bar = new WindowBar();
+        _bar.Initialize(config);
+        _bar.Shown += _notch.KeepOnTop;
+        // Eine Form: Die Notch beginnt an der Unterkante der Leiste und überdeckt dort deren Trennlinie (1 px)
+        _bar.PresenceChanged += present => _notch.SetBarInset(present ? _bar.BarHeight - 1 : 0);
+        _bar.Show();
+
         _fullscreenWatcher = new FullscreenWatcher { HideOnMaximized = config.HideOnMaximized };
         _fullscreenWatcher.Changed += _notch.SetSuppressed;
+        _notch.VisibleChanged += _bar.SetNotchVisible; // Leiste und Notch: immer zusammen da oder weg
     }
 
     private WallpaperPicker CreateWallpaperPicker()
@@ -123,6 +133,10 @@ public partial class App : Application
                 Monitors.NotchSpec = _config.NotchMonitor;
                 Monitors.Invalidate();
                 _notch?.MoveToNotchMonitor();
+                _bar?.MoveToNotchMonitor();
+                break;
+            case nameof(TomodachiConfig.ShowTopBar):
+                _bar?.SetEnabled(_config.ShowTopBar);
                 break;
             case nameof(TomodachiConfig.HideOnMaximized):
                 if (_fullscreenWatcher is not null) _fullscreenWatcher.HideOnMaximized = _config.HideOnMaximized;
@@ -205,6 +219,7 @@ public partial class App : Application
         _tapHotkey?.Dispose();
         _fullscreenWatcher?.Dispose();
         _wallpaper?.Dispose();
+        _bar?.Close();
         _notch?.Close();
         _appIndex?.Dispose();
         _sensors?.Dispose();

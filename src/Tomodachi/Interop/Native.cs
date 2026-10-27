@@ -136,7 +136,6 @@ internal static partial class Native
 
     [LibraryImport("shell32.dll")]
     public static partial nuint SHAppBarMessage(uint message, ref APPBARDATA data);
-
     [LibraryImport("user32.dll")]
     public static partial nint GetForegroundWindow();
 

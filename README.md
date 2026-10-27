@@ -1,8 +1,8 @@
 # tomodachi
 
 A [Noctalia](https://github.com/noctalia-dev/noctalia)-style shell for Windows. It replaces the Start menu and the taskbar
-with a single notch at the top of the screen: tap the Win key and it unfolds into an app launcher, widgets, a window list,
-settings and a power menu.
+with a slim bar at the top of the screen, a notch flowing out of its middle: tap the Win key and the notch unfolds into an
+app launcher, widgets, a window list, settings and a power menu.
 
 *[Deutsche Kurzfassung](README.de.md)*
 
@@ -15,14 +15,15 @@ settings and a power menu.
 | | |
 |---|---|
 | **Win key** | A tap opens the notch instead of the Start menu. Win+E, Win+L, Win+Shift+S and the other combos keep working; only Win+W is taken (it opens tomodachi's widgets instead of Windows' widget board). |
+| **Top bar** | One bar across the notch monitor with your open windows as tabs, left of the notch; click to switch or minimize. Prefer just the notch? Settings → *Notch only*. |
 | **Apps** | Fuzzy search over everything in "All apps", plus Steam games and program shortcuts on the desktop. Right-click → *Run as administrator*. |
-| **Widgets** | Clock and calendar, media controls, CPU / GPU / RAM with history, drives (NVMe temperatures need admin rights), network. Win+W or click the avatar. |
+| **Widgets** | Clock and calendar, media controls, CPU / GPU / RAM with history, drives (NVMe temperatures need admin rights), network. Quick settings: volume, mute, output device, Wi-Fi and Bluetooth on/off, Wi-Fi networks (Wi-Fi/Bluetooth only show up if the PC has them, and haven't been tested on real hardware yet). Win+W or click the avatar. |
 | **Windows** | Open and minimized windows, since there is no taskbar anymore. Right-click → bring to front, close, or (opt-in) *End task*. |
 | **Power** | Lock, sleep, sign out, restart, shut down. Anything that ends the session needs a second click. |
-| **Settings** | Profile picture, notch monitor, language, Win key, taskbar, autostart, wallpaper folder. No config files needed. |
+| **Settings** | Bar with notch or notch only, profile picture, notch monitor, language, Win key, taskbar, autostart, wallpaper folder. No config files needed. |
 | **Wallpapers** | Win+Ctrl+W opens a full-screen strip of slanted wallpaper cards; Enter applies the picture. |
 | **Taskbar** | Gone while tomodachi runs, back the moment it quits. |
-| **Fullscreen** | The notch hides over games, videos, maximized windows and Windows 11's snap bar. A Win tap still brings it up. |
+| **Fullscreen** | Bar and notch hide over games, videos, maximized windows and Windows 11's snap bar; nothing reserves screen space. A Win tap still brings both up. |
 
 The UI is available in English and German (follows Windows, or pick one in Settings).
 
@@ -60,6 +61,7 @@ tomodachi hooks the keyboard and can run as admin, so here is exactly what it do
 
 - **No network.** tomodachi's own code opens no network connections: no telemetry, no update checks, no accounts.
   The network widget only reads your adapter's traffic counters. (Checked on a running instance: 0 TCP, 0 UDP.)
+  The Wi-Fi list asks Windows to scan and, when you click a network, to connect; Windows does that, not tomodachi.
 - **Keyboard: it sees every key, it uses only the Win key.** That's how keyboard hooks work: a low-level hook and a
   raw-input listener both receive every keystroke. The code only acts on the Win key (plus Win+W, Win+L, Ctrl+Esc,
   and Esc while the notch is open); while Win is held, other keys are only checked to tell a combo from a tap.
@@ -70,7 +72,8 @@ tomodachi hooks the keyboard and can run as admin, so here is exactly what it do
   anti-cheat is focused. They come from a Task Scheduler entry you enable in Settings and can remove any time.
   Apps you start from the launcher run *without* admin rights unless you pick *Run as administrator*.
 - **System changes are reversible.** It changes the taskbar (auto-hide, hidden windows), and, only when you ask,
-  the autostart task and your wallpaper. Taskbar changes go to a restore journal first and are undone on quit,
+  the autostart task, your wallpaper, volume, default output device and Wi-Fi/Bluetooth (quick settings change
+  exactly what you click, like Windows' own quick settings would, and aren't undone on quit). Taskbar changes go to a restore journal first and are undone on quit,
   crash, sign-out or `--restore`. tomodachi's code reads two registry values (Steam's path, the fast-startup flag) and
   writes none; Windows itself stores the taskbar's auto-hide setting and the scheduled task, as it always does.
 - **Your data stays local.** Settings, logs, launch history (which apps you start, for ranking), the restore journal
@@ -135,13 +138,14 @@ src/Tomodachi/
   Core/          config, logging, single instance, autostart, elevation
   Input/         Win key hook + state machine, global hotkeys
   Notch/         the notch window, its tabs, settings, power menu, avatar
+  Bar/           the top bar with window tabs
   Launcher/      app index (Start menu, Steam, desktop), fuzzy search, launch history
-  Widgets/       sensors, network, media, window list and their views
+  Widgets/       sensors, network, media, audio, radios, window list and their views
   Wallpaper/     the wallpaper picker
   Shell/         taskbar, fullscreen detection, power actions
   Safety/        restore journal, watchdog, emergency hotkey
   Localization/  UI texts (Strings.resx = English, Strings.de.resx = German)
-tests/           unit tests (key handling, search, widget math, power menu, localization)
+tests/           unit tests (key handling, search, widget math, power menu, top bar, quick settings, localization)
 tools/           publish and update scripts
 packaging/       readme and license notes that ship with a release
 docs/            roadmap and the original German development log

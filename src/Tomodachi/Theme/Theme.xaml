@@ -30,14 +30,21 @@
     <!-- Widgets-Reiter: drei Spalten -->
     <sys:Double x:Key="NotchWidgetsWidth">960</sys:Double>
     <sys:Double x:Key="NotchExpandedHeight">470</sys:Double>
+    <!-- Widgets-Reiter: 48 Kopf + 526 Inhalt (dritte Spalte mit Schnelleinstellungen) + 16 Rand -->
+    <sys:Double x:Key="NotchWidgetsHeight">590</sys:Double>
     <!-- Power-Reiter: 48 Kopf + 104 Kacheln + 34 Laufzeit + 22 Rand -->
     <sys:Double x:Key="NotchPowerHeight">208</sys:Double>
-    <!-- Einstellungs-Reiter: 48 Kopf + 514 Inhalt + 16 Rand -->
-    <sys:Double x:Key="NotchSettingsHeight">578</sys:Double>
+    <!-- Einstellungs-Reiter: 48 Kopf + 558 Inhalt + 16 Rand -->
+    <sys:Double x:Key="NotchSettingsHeight">622</sys:Double>
     <sys:Double x:Key="NotchEarRadius">10</sys:Double>
     <sys:Double x:Key="NotchCornerRadius">16</sys:Double>
     <sys:Double x:Key="NotchExpandedCornerRadius">30</sys:Double>
     <sys:Double x:Key="AvatarSize">30</sys:Double>
+
+    <!-- „Leiste mit Notch“: eine Leiste oben, die Notch wölbt sich als Teil davon unter ihr heraus -->
+    <sys:Double x:Key="TopBarHeight">34</sys:Double>
+    <sys:Double x:Key="NotchIntegratedWidth">120</sys:Double>
+    <sys:Double x:Key="NotchIntegratedBulge">20</sys:Double>
 
     <!-- Animation -->
     <Duration x:Key="FastDuration">0:0:0.15</Duration>

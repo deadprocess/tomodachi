@@ -1,0 +1,76 @@
+<overlay:OverlayWindow x:Class="Tomodachi.Bar.WindowBar"
+                       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                       xmlns:overlay="clr-namespace:Tomodachi.Overlay"
+                       xmlns:bar="clr-namespace:Tomodachi.Bar"
+                       Title="tomodachi bar"
+                       FontFamily="{StaticResource UiFont}"
+                       UseLayoutRounding="True">
+    <!--
+        Obere Leiste (Idee eines Freundes von deadprocess): über die ganze Breite des Notch-Monitors, so dunkel wie die
+        Notch, die sich als Teil davon in der Mitte unter ihr herauswölbt (eine Form, siehe NotchWindow.SetBarInset).
+        Offene Fenster als Tabs links der Notch.
+        Als AppBar angemeldet: maximierte Fenster beginnen darunter.
+    -->
+    <Window.Resources>
+        <DataTemplate x:Key="TabTemplate" DataType="{x:Type bar:BarTab}">
+            <Grid x:Name="Tab" Width="{Binding Width}" Height="28" Margin="2,0" Cursor="Hand" Background="Transparent"
+                  Tag="{Binding Handle}" ToolTip="{Binding Title}"
+                  MouseLeftButtonUp="OnTabClicked" MouseRightButtonUp="OnTabRightClicked">
+                <Border x:Name="Bg" CornerRadius="8" Background="Transparent" />
+                <Grid x:Name="Content" Margin="10,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Image x:Name="Icon" Source="{Binding Icon}" Width="16" Height="16" VerticalAlignment="Center"
+                           RenderOptions.BitmapScalingMode="HighQuality" />
+                    <TextBlock x:Name="Caption" Grid.Column="1" Text="{Binding Title}" Margin="8,0,0,0" FontSize="12.5"
+                               Foreground="{StaticResource TextBrush}" TextTrimming="CharacterEllipsis"
+                               VerticalAlignment="Center" />
+                </Grid>
+                <!-- Strich unter dem aktiven Fenster -->
+                <Border x:Name="Underline" Width="16" Height="2" CornerRadius="1" Margin="0,0,0,1"
+                        VerticalAlignment="Bottom" HorizontalAlignment="Center"
+                        Background="{StaticResource AccentBrush}" Visibility="Hidden" />
+            </Grid>
+            <DataTemplate.Triggers>
+                <Trigger SourceName="Tab" Property="IsMouseOver" Value="True">
+                    <Setter TargetName="Bg" Property="Background" Value="{StaticResource HoverBrush}" />
+                </Trigger>
+                <DataTrigger Binding="{Binding IsActive}" Value="True">
+                    <Setter TargetName="Bg" Property="Background" Value="{StaticResource SelectedBrush}" />
+                    <Setter TargetName="Underline" Property="Visibility" Value="Visible" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Minimized}" Value="True">
+                    <Setter TargetName="Caption" Property="Opacity" Value="0.55" />
+                    <Setter TargetName="Icon" Property="Opacity" Value="0.7" />
+                </DataTrigger>
+                <!-- Sehr viele Fenster: nur noch das Icon, mittig -->
+                <DataTrigger Binding="{Binding ShowTitle}" Value="False">
+                    <Setter TargetName="Caption" Property="Visibility" Value="Collapsed" />
+                    <Setter TargetName="Content" Property="HorizontalAlignment" Value="Center" />
+                    <Setter TargetName="Content" Property="Margin" Value="0" />
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+
+        <ItemsPanelTemplate x:Key="Row">
+            <StackPanel Orientation="Horizontal" />
+        </ItemsPanelTemplate>
+    </Window.Resources>
+
+    <Border x:Name="Root" Background="{StaticResource SurfaceBrush}"
+            BorderBrush="{StaticResource SurfaceBorderBrush}" BorderThickness="0,0,0,1">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition x:Name="NotchGap" Width="232" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <!-- Tabs nur links der Notch, rechts bleibt frei -->
+            <ItemsControl x:Name="LeftTabs" ItemTemplate="{StaticResource TabTemplate}" ItemsPanel="{StaticResource Row}"
+                          HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,0,0,0" />
+        </Grid>
+    </Border>
+</overlay:OverlayWindow>

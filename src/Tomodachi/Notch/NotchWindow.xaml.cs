@@ -54,6 +54,12 @@ public partial class NotchWindow : OverlayWindow
     private readonly double _expandedHeight;
     private readonly double _powerHeight;
     private readonly double _settingsHeight;
+    private readonly double _widgetsHeight;
+    private readonly double _integratedWidth;
+    private readonly double _integratedBulge;
+    private readonly double _avatarSize;
+    private double _inset; // Höhe der Leiste bei „Leiste mit Notch“, sonst 0
+    private bool _visible = true;
     private readonly double _corner;
     private readonly double _expandedCorner;
     private readonly Duration _fast;
@@ -81,13 +87,17 @@ public partial class NotchWindow : OverlayWindow
         _expandedHeight = Resource<double>("NotchExpandedHeight");
         _powerHeight = Resource<double>("NotchPowerHeight");
         _settingsHeight = Resource<double>("NotchSettingsHeight");
+        _widgetsHeight = Resource<double>("NotchWidgetsHeight");
+        _integratedWidth = Resource<double>("NotchIntegratedWidth");
+        _integratedBulge = Resource<double>("NotchIntegratedBulge");
+        _avatarSize = Resource<double>("AvatarSize");
         _corner = Resource<double>("NotchCornerRadius");
         _expandedCorner = Resource<double>("NotchExpandedCornerRadius");
         _fast = Resource<Duration>("FastDuration");
         _medium = Resource<Duration>("MediumDuration");
 
         Width = Math.Max(_appsWidth, _widgetsWidth) + 2 * _ear + 2 * WindowPadding;
-        Height = Math.Max(_expandedHeight, _settingsHeight) + WindowPadding;
+        Height = Math.Max(Math.Max(_expandedHeight, _widgetsHeight), _settingsHeight) +Resource<double>("TopBarHeight") + WindowPadding;
         Host.Width = _width + 2 * _ear;
         Host.Height = _height;
         Shape.CornerRadius = _corner;
@@ -112,6 +122,12 @@ public partial class NotchWindow : OverlayWindow
 
     /// <summary>Klick auf das Profilbild.</summary>
     public event Action? AvatarClicked;
+
+    /// <summary>
+    /// Notch sichtbar (true) oder ausgeblendet (maximiert, Vollbild, Snap-Leiste). Die Leiste folgt dem, damit Notch und
+    /// Leiste immer eine Einheit sind, auch wenn ein Win-Tipp die Notch über einem maximierten Fenster öffnet.
+    /// </summary>
+    public event Action<bool>? VisibleChanged;
 
     /// <summary>Im Power-Reiter bestätigt. Die Notch ist dann schon zugeklappt.</summary>
     public event Action<PowerAction>? PowerRequested;
@@ -141,6 +157,13 @@ public partial class NotchWindow : OverlayWindow
 
     /// <summary>Nach einem Wechsel des Notch-Monitors in den Einstellungen.</summary>
     public void MoveToNotchMonitor() => Reposition();
+
+    /// <summary>Über die obere Leiste legen. Beide sind „topmost“, es gewinnt das zuletzt nach vorn geholte Fenster.</summary>
+    public void KeepOnTop()
+    {
+        if (Handle != 0)
+            Native.SetWindowPos(Handle, Native.HWND_TOPMOST, 0, 0, 0, 0, Native.SWP_NOMOVE | Native.SWP_NOSIZE | Native.SWP_NOACTIVATE);
+    }
 
     /// <summary>Zu → öffnen. Offen auf diesem Reiter → zu. Offen auf einem anderen → Reiter wechseln.</summary>
     public void Toggle(NotchTab tab)
@@ -185,7 +208,8 @@ public partial class NotchWindow : OverlayWindow
         HookForeground(false);
         _clock.Stop();
         _widgets?.Stop();
-        AnimateShape(_width, _height, _corner, _medium);
+        AnimateShape(CollapsedWidth, CollapsedHeight, _corner, _medium);
+        MoveAvatar(open: false);
         FadeOut(Header);
         FadeOut(Launcher);
         FadeOut(Widgets);
@@ -204,9 +228,9 @@ public partial class NotchWindow : OverlayWindow
         Tab = tab;
         SyncTabButtons();
 
-        var width = tab == NotchTab.Widgets ? _widgetsWidth : _appsWidth;
-        var height = tab switch { NotchTab.Power => _powerHeight, NotchTab.Settings => _settingsHeight, _ => _expandedHeight };
+        var (width, height) = TabSize(tab);
         AnimateShape(width, height, _expandedCorner, _medium);
+        MoveAvatar(open: true);
         Show(Launcher, tab == NotchTab.Apps);
         Show(Widgets, tab == NotchTab.Widgets);
         Show(Windows, tab == NotchTab.Windows);
@@ -367,6 +391,11 @@ public partial class NotchWindow : OverlayWindow
     {
         var visible = !_suppressed || IsOpen;
         Root.IsHitTestVisible = visible;
+        if (visible != _visible)
+        {
+            _visible = visible;
+            VisibleChanged?.Invoke(visible);
+        }
         if (visible)
         {
             Visibility = Visibility.Visible; // ShowActivated = false: holt keinen Fokus
@@ -384,12 +413,12 @@ public partial class NotchWindow : OverlayWindow
 
     private void OnHostMouseEnter(object sender, MouseEventArgs e)
     {
-        if (!IsOpen) AnimateShape(_width + HoverGrowWidth, _height + HoverGrowHeight, _corner, _fast);
+        if (!IsOpen) AnimateShape(CollapsedWidth + HoverGrowWidth, CollapsedHeight + HoverGrowHeight, _corner, _fast);
     }
 
     private void OnHostMouseLeave(object sender, MouseEventArgs e)
     {
-        if (!IsOpen) AnimateShape(_width, _height, _corner, _fast);
+        if (!IsOpen) AnimateShape(CollapsedWidth, CollapsedHeight, _corner, _fast);
     }
 
     private void AnimateShape(double bodyWidth, double height, double corner, Duration duration)
@@ -397,6 +426,59 @@ public partial class NotchWindow : OverlayWindow
         Animate(Host, WidthProperty, bodyWidth + 2 * _ear, duration);
         Animate(Host, HeightProperty, height, duration);
         Animate(Shape, NotchShape.CornerRadiusProperty, corner, duration);
+    }
+
+    /// <summary>
+    /// „Leiste mit Notch“ an (Höhe der Leiste) oder aus (0). Die Form beginnt dann an der Unterkante der Leiste: Ihre
+    /// Füllung überdeckt dort die Trennlinie der Leiste, ihre Ohren und ihre Kontur laufen in die Leiste über. So ist es
+    /// eine einzige Form. Kopfzeile und Reiter rutschen unter die Leiste.
+    /// </summary>
+    public void SetBarInset(double inset)
+    {
+        if (Math.Abs(inset - _inset) < 0.5) return;
+        _inset = inset;
+        Shape.Margin = new Thickness(0, inset, 0, 0);
+        Header.Margin = new Thickness(0, inset, 0, 0);
+        foreach (var view in new FrameworkElement[] { Launcher, Widgets, Windows, Settings, Power })
+            view.Margin = new Thickness(0, 48 + inset, 0, 0);
+
+        if (IsOpen)
+        {
+            var (width, height) = TabSize(Tab);
+            AnimateShape(width, height, _expandedCorner, _medium);
+        }
+        else
+        {
+            AnimateShape(CollapsedWidth, CollapsedHeight, _corner, _medium);
+        }
+        MoveAvatar(IsOpen);
+    }
+
+    /// <summary>Zugeklappt: ohne Leiste die klassische Notch, mit Leiste eine schmale Wölbung unter ihr.</summary>
+    private double CollapsedWidth => _inset > 0 ? _integratedWidth : _width;
+
+    private double CollapsedHeight => _inset > 0 ? _inset + _integratedBulge : _height;
+
+    private (double Width, double Height) TabSize(NotchTab tab)
+    {
+        var width = tab == NotchTab.Widgets ? _widgetsWidth : _appsWidth;
+        var height = tab switch
+        {
+            NotchTab.Power => _powerHeight,
+            NotchTab.Settings => _settingsHeight,
+            NotchTab.Widgets => _widgetsHeight,
+            _ => _expandedHeight,
+        };
+        return (width, _inset + height);
+    }
+
+    /// <summary>Profilbild: zugeklappt mittig auf der Kante zwischen Leiste und Wölbung, aufgeklappt in der Kopfzeile.</summary>
+    private void MoveAvatar(bool open)
+    {
+        var top = open ? _inset + 5
+            : _inset > 0 ? (_inset + _integratedBulge - _avatarSize) / 2
+            : 5;
+        Avatar.BeginAnimation(MarginProperty, new ThicknessAnimation(new Thickness(0, top, 0, 0), _medium) { EasingFunction = Ease });
     }
 
     private void Show(UIElement element, bool visible)

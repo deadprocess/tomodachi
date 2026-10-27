@@ -136,6 +136,8 @@ public sealed class WidgetViewModel : Observable
 
     public ObservableCollection<WindowItem> Windows { get; } = [];
 
+    public QuickSettingsViewModel Quick { get; } = new();
+
     internal void UpdateClock(DateTime now)
     {
         Time = now.ToString("HH:mm", Culture);
