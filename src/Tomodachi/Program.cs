@@ -17,6 +17,12 @@ internal static class Program
             return Watchdog.Run(pid);
         }
 
+        if (options.RunAsTarget is string runAs)
+        {
+            Log.Init("cli");
+            return Elevation.RunAsWithPrompt(runAs);
+        }
+
         if (options.Install || options.Uninstall)
         {
             Log.Init("cli");

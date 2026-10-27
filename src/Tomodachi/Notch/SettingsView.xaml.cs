@@ -224,7 +224,7 @@ public partial class SettingsView : UserControl
     {
         Directory.CreateDirectory(Paths.LogDir);
         // Über explorer.exe: öffnet das Fenster in der Explorer-Instanz des Users, auch wenn tomodachi elevated läuft
-        Process.Start(new ProcessStartInfo("explorer.exe", $"\"{Paths.LogDir}\"") { UseShellExecute = false })?.Dispose();
+        Process.Start(new ProcessStartInfo(Paths.Explorer, $"\"{Paths.LogDir}\"") { UseShellExecute = false })?.Dispose();
     }
 
     private void OnRestart(object sender, RoutedEventArgs e) => RestartRequested?.Invoke();

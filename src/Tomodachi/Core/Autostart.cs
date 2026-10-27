@@ -215,7 +215,7 @@ internal static class Autostart
 
     private static (int ExitCode, string Output) Schtasks(params string[] args)
     {
-        var info = new ProcessStartInfo("schtasks.exe")
+        var info = new ProcessStartInfo(Path.Combine(Environment.SystemDirectory, "schtasks.exe"))
         {
             UseShellExecute = false,
             CreateNoWindow = true,

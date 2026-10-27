@@ -39,6 +39,13 @@ internal sealed record StartupOptions
 
     /// <summary>Von der Aufgabenplanung gestartet: nie erneut über die Aufgabe neu starten (Endlosschleife).</summary>
     public bool FromTask { get; init; }
+
+    /// <summary>
+    /// Interner Modus mit Userrechten: das Ziel per „runas“ starten, damit Windows die UAC-Abfrage zeigt
+    /// (<see cref="Launcher.AppLauncher"/>, wenn tomodachi selbst elevated läuft).
+    /// </summary>
+    public string? RunAsTarget { get; init; }
+    public const string RunAsArgument = "--runas";
     public static StartupOptions Parse(string[] args)
     {
         var options = new StartupOptions();
@@ -60,6 +67,10 @@ internal sealed record StartupOptions
                 case Autostart.FromTaskArgument: options = options with { FromTask = true }; break;
                 case "--watchdog" when i + 1 < args.Length && int.TryParse(args[i + 1], out var pid):
                     options = options with { WatchdogPid = pid };
+                    i++;
+                    break;
+                case RunAsArgument when i + 1 < args.Length:
+                    options = options with { RunAsTarget = args[i + 1] };
                     i++;
                     break;
             }

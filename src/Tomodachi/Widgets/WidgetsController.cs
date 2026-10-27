@@ -98,7 +98,7 @@ internal sealed class WidgetsController
             Quick.UpdateNetworks(await _radios.ScanAsync());
             return;
         }
-        Process.Start(new ProcessStartInfo("explorer.exe", "ms-settings:network-wifi") { UseShellExecute = false })?.Dispose();
+        Process.Start(new ProcessStartInfo(Paths.Explorer, "ms-settings:network-wifi") { UseShellExecute = false })?.Dispose();
     }
 
     /// <summary>

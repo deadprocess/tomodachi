@@ -65,7 +65,7 @@ internal static class Taskbar
         {
             // Explorer läuft nicht (abgestürzt oder beendet). Neu starten baut die Taskleiste wieder auf.
             Log.Warn("Shell_TrayWnd nicht gefunden, starte explorer.exe");
-            Process.Start(new ProcessStartInfo("explorer.exe") { UseShellExecute = true });
+            Process.Start(new ProcessStartInfo(Paths.Explorer) { UseShellExecute = true });
             return;
         }
 

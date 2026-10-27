@@ -1,6 +1,5 @@
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
 using Tomodachi.Core;
 using Tomodachi.Interop;
 
@@ -8,9 +7,6 @@ namespace Tomodachi.Launcher;
 
 internal static class AppLauncher
 {
-    private static readonly string Explorer =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "explorer.exe");
-
     /// <summary>
     /// Startet eine App über <c>shell:AppsFolder</c>, ihre Verknüpfung oder ihre URL (<see cref="AppEntry.LaunchTarget"/>).
     /// Läuft die Shell elevated, geht der Start über explorer.exe:
@@ -27,8 +23,16 @@ internal static class AppLauncher
             ProcessStartInfo info;
             if (Elevation.IsElevated && !elevated)
             {
-                info = new ProcessStartInfo(Explorer) { UseShellExecute = false };
+                info = new ProcessStartInfo(Paths.Explorer) { UseShellExecute = false };
                 info.ArgumentList.Add(target);
+            }
+            else if (Elevation.IsElevated && !TrustedForSilentElevation(app))
+            {
+                // Aus dem elevated Prozess fragt „runas“ nicht mehr nach. Für Ziele, die auch ein Programm ohne Adminrechte
+                // ändern könnte, soll Windows aber fragen: also ein tomodachi mit Userrechten starten, das „runas“ ausführt.
+                DesktopUser.Start(Environment.ProcessPath!, StartupOptions.RunAsArgument, target);
+                Log.Info($"Starte '{app.Name}' als Admin mit UAC-Abfrage ({app.Id})");
+                return true;
             }
             else
             {
@@ -54,5 +58,19 @@ internal static class AppLauncher
             Log.Error($"Start von '{app.Name}' fehlgeschlagen", ex);
             return false;
         }
+    }
+
+    /// <summary>Ohne UAC-Abfrage nur, was ein Nicht-Admin nicht austauschen kann (siehe <see cref="LaunchTarget"/>).</summary>
+    private static bool TrustedForSilentElevation(AppEntry app)
+    {
+        var file = LaunchTarget.ResolveFile(app);
+        if (file is null)
+        {
+            Log.Info($"'{app.Name}': Ziel {app.LaunchTarget} ist keine prüfbare Datei, Admin-Start nur mit UAC-Abfrage");
+            return false;
+        }
+        if (LaunchTarget.IsTrustedForElevation(file)) return true;
+        Log.Info($"'{app.Name}': {file} dürfen auch Nicht-Admins ändern, Admin-Start nur mit UAC-Abfrage");
+        return false;
     }
 }

@@ -4,6 +4,13 @@ namespace Tomodachi.Core;
 
 internal static class Paths
 {
+    /// <summary>
+    /// Immer mit vollem Pfad starten: Ein nackter Name würde erst im Arbeitsverzeichnis und dann im PATH gesucht,
+    /// und der elevated Prozess soll nie eine untergeschobene explorer.exe treffen.
+    /// </summary>
+    public static string Explorer { get; } =
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "explorer.exe");
+
     public static string Root { get; } =
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "tomodachi");
 

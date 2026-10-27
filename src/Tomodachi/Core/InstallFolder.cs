@@ -42,12 +42,20 @@ internal static class InstallFolder
     /// Leer = sicher.
     /// Deny-Einträge werden ignoriert: lieber einmal zu oft warnen als zu selten.
     /// </summary>
-    public static IReadOnlyList<string> FindWritable(string exe)
+    /// <param name="includeSiblings">
+    /// Auch die anderen Exe- und DLL-Dateien im Ordner prüfen (für die eigene Exe: eine ausgetauschte DLL daneben würde mitgeladen).
+    /// Für ein fremdes Startziel reicht die Datei selbst samt Ordnern.
+    /// </param>
+    public static IReadOnlyList<string> FindWritable(string exe, bool includeSiblings = true)
     {
         var problems = new List<string>();
-        var folder = new DirectoryInfo(Path.GetDirectoryName(Path.GetFullPath(exe))!);
+        var target = new FileInfo(Path.GetFullPath(exe));
+        var folder = target.Directory!;
 
-        foreach (var file in folder.EnumerateFiles().Where(f => f.Extension.ToLowerInvariant() is ".exe" or ".dll"))
+        var files = includeSiblings
+            ? folder.EnumerateFiles().Where(f => f.Extension.ToLowerInvariant() is ".exe" or ".dll")
+            : [target];
+        foreach (var file in files.Where(f => f.Exists))
             Check(file.FullName, file.GetAccessControl(), FileWrite, problems);
 
         Check(folder.FullName, folder.GetAccessControl(), FolderWrite, problems);
