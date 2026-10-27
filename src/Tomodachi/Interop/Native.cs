@@ -19,6 +19,15 @@ internal struct POINT
 }
 
 [StructLayout(LayoutKind.Sequential)]
+internal struct CURSORINFO
+{
+    public uint cbSize;
+    public uint flags;
+    public nint hCursor;
+    public POINT ptScreenPos;
+}
+
+[StructLayout(LayoutKind.Sequential)]
 internal struct MONITORINFO
 {
     public uint cbSize;
@@ -179,6 +188,16 @@ internal static partial class Native
 
     [LibraryImport("user32.dll")]
     public static partial nint MonitorFromWindow(nint hWnd, uint flags);
+
+    public const uint CURSOR_SHOWING = 0x1;
+
+    /// <summary>Position in physischen Pixeln und ob der Zeiger sichtbar ist (Spiele blenden ihn meist aus).</summary>
+    [LibraryImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool GetCursorInfo(ref CURSORINFO info);
+
+    [LibraryImport("user32.dll")]
+    public static partial nint WindowFromPoint(POINT point);
 
     [LibraryImport("user32.dll")]
     public static partial nint SetWinEventHook(uint eventMin, uint eventMax, nint hmodWinEventProc, nint winEventProc,

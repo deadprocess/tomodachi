@@ -43,6 +43,14 @@ public partial class NotchWindow : OverlayWindow
     /// <summary>Nach einer eigenen Fokus-Übergabe kurz keine Vordergrund-Wechsel als „Klick woanders hin“ werten.</summary>
     private static readonly TimeSpan FocusHandoffGrace = TimeSpan.FromMilliseconds(500);
 
+    /// <summary>Ausgeblendet: Zeiger so nah (DIP) am oberen Rand über der Notch blendet sie ein.</summary>
+    private const double PeekEdge = 6;
+    /// <summary>Rand (DIP) um Notch bzw. Leiste, in dem sie eingeblendet bleibt.</summary>
+    private const double PeekMargin = 24;
+    /// <summary>So lange muss der Zeiger oben verweilen. Nur durchgewischt (Tab in Firefox anklicken) blendet nichts ein.</summary>
+    private static readonly TimeSpan PeekDelay = TimeSpan.FromMilliseconds(150);
+    private static readonly TimeSpan PeekHold = TimeSpan.FromMilliseconds(500);
+
     private static readonly IEasingFunction Ease = new CubicEase { EasingMode = EasingMode.EaseOut };
     private static NotchWindow? s_instance;
 
@@ -72,6 +80,10 @@ public partial class NotchWindow : OverlayWindow
     private nint _foregroundHook;
     private DateTime _focusHandoffAt;
     private bool _suppressed;
+    private bool _peeking; // ausgeblendet, aber per Maus oben am Rand zurückgeholt
+    private readonly DispatcherTimer _peekTimer;
+    private DateTime? _peekNearSince;
+    private DateTime _peekLastNear;
     private bool _syncingTabs;
 
     public NotchWindow()
@@ -104,6 +116,8 @@ public partial class NotchWindow : OverlayWindow
 
         _clock = new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Background,
             (_, _) => HeaderTime.Text = DateTime.Now.ToString("HH:mm"), Dispatcher);
+        _peekTimer = new DispatcherTimer(TimeSpan.FromMilliseconds(50), DispatcherPriority.Background, (_, _) => CheckPeek(), Dispatcher);
+        _peekTimer.Stop();
 
         PreviewKeyDown += OnPreviewKeyDown;
         Host.MouseEnter += OnHostMouseEnter;
@@ -173,11 +187,92 @@ public partial class NotchWindow : OverlayWindow
         else OpenNotch(tab);
     }
 
-    /// <summary>Bei Vollbild-Programmen wegblenden. Ausgeklappt bleibt die Notch trotzdem sichtbar.</summary>
+    /// <summary>
+    /// Bei Vollbild-Programmen wegblenden. Ausgeklappt bleibt die Notch trotzdem sichtbar, ebenso solange die Maus oben
+    /// an ihr bzw. an der Leiste ist (<see cref="CheckPeek"/>).
+    /// </summary>
     public void SetSuppressed(bool suppressed)
     {
         _suppressed = suppressed;
+        _peeking = false;
+        _peekNearSince = null;
+        if (suppressed) _peekTimer.Start();
+        else _peekTimer.Stop();
         UpdateVisibility();
+    }
+
+    /// <summary>
+    /// Ausgeblendet: Verweilt der Zeiger oben am Rand über der Notch, kommen Notch und Leiste zurück, bis er sich von
+    /// beiden entfernt (27.10.2026, Wunsch von deadprocess). Nicht bei gedrückter Maustaste, denn wer ein Fenster an den
+    /// oberen Rand zieht, will die Snap-Leiste. Nicht bei ausgeblendetem Zeiger, also nicht mitten im Spiel.
+    /// </summary>
+    private void CheckPeek()
+    {
+        var info = new CURSORINFO { cbSize = (uint)Marshal.SizeOf<CURSORINFO>() };
+        if (!Native.GetCursorInfo(ref info)) return;
+        var cursor = info.ptScreenPos;
+        var now = DateTime.UtcNow;
+
+        if (_peeking)
+        {
+            if (IsOpen || CursorNearShown(cursor)) _peekLastNear = now;
+            else if (now - _peekLastNear > PeekHold) StopPeek();
+            return;
+        }
+
+        var buttonDown = Native.GetAsyncKeyState(Native.VK_LBUTTON) < 0 || Native.GetAsyncKeyState(Native.VK_RBUTTON) < 0;
+        if (buttonDown || (info.flags & Native.CURSOR_SHOWING) == 0 || !CursorAtNotchEdge(cursor))
+        {
+            _peekNearSince = null;
+            return;
+        }
+        _peekNearSince ??= now;
+        if (now - _peekNearSince < PeekDelay) return;
+
+        Log.Debug("Notch per Maus eingeblendet");
+        _peeking = true;
+        _peekLastNear = now;
+        UpdateVisibility();
+    }
+
+    private void StopPeek()
+    {
+        Log.Debug("Notch per Maus wieder ausgeblendet");
+        _peeking = false;
+        _peekNearSince = null;
+        UpdateVisibility();
+    }
+
+    /// <summary>Oben am Rand des Notch-Monitors, waagrecht im Bereich der zugeklappten Notch (plus Rand).</summary>
+    private bool CursorAtNotchEdge(POINT cursor)
+    {
+        var monitor = Monitors.Info(Monitors.NotchHandle()).rcMonitor;
+        var scale = System.Windows.Media.VisualTreeHelper.GetDpi(this).DpiScaleX;
+        var halfWidth = (CollapsedWidth / 2 + _ear + PeekMargin) * scale;
+        var center = monitor.Left + monitor.Width / 2.0;
+        return cursor.Y >= monitor.Top && cursor.Y < monitor.Top + PeekEdge * scale
+            && Math.Abs(cursor.X - center) <= halfWidth;
+    }
+
+    /// <summary>
+    /// Über Notch oder Leiste (plus Rand) oder über einem eigenen Fenster, etwa dem Rechtsklick-Menü eines Leisten-Tabs.
+    /// Durchsichtige Stellen der eigenen Fenster lässt Windows durch, die zählen also nicht.
+    /// </summary>
+    private bool CursorNearShown(POINT cursor)
+    {
+        var hwnd = Native.WindowFromPoint(cursor);
+        if (hwnd != 0)
+        {
+            Native.GetWindowThreadProcessId(hwnd, out var pid);
+            if (pid == _ownProcessId) return true;
+        }
+
+        var monitor = Monitors.Info(Monitors.NotchHandle()).rcMonitor;
+        var scale = System.Windows.Media.VisualTreeHelper.GetDpi(this).DpiScaleX;
+        var halfWidth = _inset > 0 ? monitor.Width / 2.0 : (CollapsedWidth / 2 + _ear + PeekMargin) * scale;
+        var center = monitor.Left + monitor.Width / 2.0;
+        return cursor.Y >= monitor.Top && cursor.Y < monitor.Top + (CollapsedHeight + PeekMargin) * scale
+            && Math.Abs(cursor.X - center) <= halfWidth;
     }
 
     private void OpenNotch(NotchTab tab)
@@ -389,7 +484,7 @@ public partial class NotchWindow : OverlayWindow
     /// </summary>
     private void UpdateVisibility()
     {
-        var visible = !_suppressed || IsOpen;
+        var visible = !_suppressed || IsOpen || _peeking;
         Root.IsHitTestVisible = visible;
         if (visible != _visible)
         {
@@ -406,7 +501,7 @@ public partial class NotchWindow : OverlayWindow
         var fade = new DoubleAnimation(0, _medium) { EasingFunction = Ease };
         fade.Completed += (_, _) =>
         {
-            if (_suppressed && !IsOpen) Visibility = Visibility.Hidden;
+            if (_suppressed && !IsOpen && !_peeking) Visibility = Visibility.Hidden;
         };
         Root.BeginAnimation(OpacityProperty, fade);
     }

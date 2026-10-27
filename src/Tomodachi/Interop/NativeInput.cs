@@ -132,6 +132,8 @@ internal static partial class Native
     public const uint WM_TIMER = 0x0113;
     public const uint PM_NOREMOVE = 0x0000;
 
+    public const ushort VK_LBUTTON = 0x01;
+    public const ushort VK_RBUTTON = 0x02;
     public const ushort VK_SHIFT = 0x10;
     public const ushort VK_CONTROL = 0x11;
     public const ushort VK_MENU = 0x12;
