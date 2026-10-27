@@ -151,7 +151,8 @@ public partial class LauncherView : UserControl
 
     /// <summary>
     /// Für jede App erlaubt. Viele Store-Apps (z. B. Windows Terminal) sind verpackte Desktop-Apps und laufen als Admin.
-    /// Lehnt Windows es ab (reine UWP-Apps, URLs), steht das im Log und die Notch bleibt offen.
+    /// URLs (steam://) starten normal, siehe <see cref="AppLauncher"/>. Lehnt Windows es ab (reine UWP-Apps),
+    /// steht das im Log und die Notch bleibt offen.
     /// </summary>
     private void OnMenuLaunchElevated(object sender, RoutedEventArgs e)
     {

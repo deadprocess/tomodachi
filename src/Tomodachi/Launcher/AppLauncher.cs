@@ -16,6 +16,13 @@ internal static class AppLauncher
     public static bool Launch(AppEntry app, bool elevated)
     {
         var target = app.LaunchTarget;
+        if (elevated && target.Contains("://", StringComparison.Ordinal))
+        {
+            // „runas“ gibt es für Protokoll-URLs nicht (Fehler 1155). Was steam:// oder epic:// startet, entscheidet
+            // ohnehin der Launcher dahinter; also normal starten statt still zu scheitern.
+            Log.Info($"'{app.Name}': {target} ist eine URL, Adminrechte vergibt der Protokoll-Handler. Starte normal");
+            elevated = false;
+        }
         Native.AllowSetForegroundWindow(Native.ASFW_ANY); // sonst landet die App womöglich hinter dem alten Fenster
 
         try
