@@ -14,8 +14,16 @@ $root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 if (-not $InstallDir) {
     $xml = [xml](schtasks /Query /TN tomodachi /XML | Out-String)
     if ($LASTEXITCODE -ne 0) { throw 'Keine Autostart-Aufgabe "tomodachi" gefunden. Zuerst in den Einstellungen „Mit Windows starten“ einschalten.' }
-    $InstallDir = Split-Path $xml.Task.Actions.Exec.Command.Trim('"')
+    $exec = $xml.Task.Actions.Exec
+    $exe = $exec.Command.Trim('"')
+    # Seit 1.5.0 startet die Aufgabe cmd.exe, und die Exe steht in Anführungszeichen in den Argumenten
+    if ($exe -notmatch 'tomodachi\.exe$') {
+        if ($exec.Arguments -notmatch '"([^"]*tomodachi\.exe)"') { throw "Aufgabe zeigt nicht auf tomodachi.exe: $($exec.Command) $($exec.Arguments)" }
+        $exe = $Matches[1]
+    }
+    $InstallDir = Split-Path $exe
 }
+if ($InstallDir.TrimEnd('\') -like "$($env:SystemRoot)*") { throw "Installationsordner $InstallDir liegt unter Windows, hier wird nichts kopiert." }
 
 # In Program Files darf nur ein Admin schreiben: einmal per UAC neu starten
 $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(
