@@ -22,4 +22,17 @@ public class WindowBarTests
         Assert.Equal([1, 3, 4], BarLayout.Order([1, 2, 3], [4, 3, 1])); // 2 zu, 4 neu und hinten dran
         Assert.Equal([5, 6], BarLayout.Order([], [5, 6]));
     }
+
+    [Theory]
+    [InlineData(0, 0)]
+    [InlineData(99, 0)]     // Mitte noch über Slot 0
+    [InlineData(100, 1)]    // Mitte genau auf der Grenze: rückt eins weiter
+    [InlineData(250, 1)]
+    [InlineData(310, 2)]
+    [InlineData(-80, 0)]    // links raus
+    [InlineData(5000, 3)]   // rechts raus: bleibt der letzte
+    public void DropIndex_FollowsTheTabCenter(double left, int index)
+    {
+        Assert.Equal(index, BarLayout.DropIndex(left, 200, 4));
+    }
 }

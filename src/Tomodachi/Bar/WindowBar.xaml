@@ -16,7 +16,8 @@
         <DataTemplate x:Key="TabTemplate" DataType="{x:Type bar:BarTab}">
             <Grid x:Name="Tab" Width="{Binding Width}" Height="28" Margin="2,0" Cursor="Hand" Background="Transparent"
                   Tag="{Binding Handle}" ToolTip="{Binding Title}"
-                  MouseLeftButtonUp="OnTabClicked" MouseRightButtonUp="OnTabRightClicked">
+                  MouseLeftButtonDown="OnTabPressed" MouseLeftButtonUp="OnTabClicked"
+                  MouseRightButtonUp="OnTabRightClicked">
                 <Border x:Name="Bg" CornerRadius="8" Background="Transparent" />
                 <Grid x:Name="Content" Margin="10,0">
                     <Grid.ColumnDefinitions>
@@ -68,9 +69,11 @@
                 <ColumnDefinition x:Name="NotchGap" Width="232" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <!-- Tabs nur links der Notch, rechts bleibt frei -->
+            <!-- Tabs nur links der Notch, rechts bleibt frei. Per Ziehen umsortierbar. -->
             <ItemsControl x:Name="LeftTabs" ItemTemplate="{StaticResource TabTemplate}" ItemsPanel="{StaticResource Row}"
-                          HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,0,0,0" />
+                          HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,0,0,0"
+                          MouseMove="OnTabsMouseMove" MouseLeftButtonUp="OnTabsReleased"
+                          LostMouseCapture="OnTabsLostCapture" />
         </Grid>
     </Border>
 </overlay:OverlayWindow>

@@ -15,7 +15,7 @@ app launcher, widgets, a window list, settings and a power menu.
 | | |
 |---|---|
 | **Win key** | A tap opens the notch instead of the Start menu. Win+E, Win+L, Win+Shift+S and the other combos keep working; only Win+W is taken (it opens tomodachi's widgets instead of Windows' widget board). |
-| **Top bar** | One bar across the notch monitor with your open windows as tabs, left of the notch; click to switch or minimize. Prefer just the notch? Settings → *Notch only*. |
+| **Top bar** | One bar across the notch monitor with your open windows as tabs, left of the notch; click to switch or minimize, drag to reorder. Prefer just the notch? Settings → *Notch only*. |
 | **Apps** | Fuzzy search over everything in "All apps", plus Steam games and program shortcuts on the desktop. Right-click → *Run as administrator*. |
 | **Widgets** | Clock and calendar, media controls, CPU / GPU / RAM with history, drives (NVMe temperatures need admin rights), network. Quick settings: volume, mute, output device, Wi-Fi and Bluetooth on/off, Wi-Fi networks (Wi-Fi/Bluetooth only show up if the PC has them, and haven't been tested on real hardware yet). Win+W or click the avatar. |
 | **Windows** | Open and minimized windows, since there is no taskbar anymore. Right-click → bring to front, close, or (opt-in) *End task*. |

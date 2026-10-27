@@ -34,4 +34,14 @@ internal static class BarLayout
         ordered.AddRange(current.Where(known.Add));
         return ordered;
     }
+
+    /// <summary>
+    /// Platz eines gezogenen Tabs: der Slot, über dem gerade seine Mitte liegt. <paramref name="left"/> ist seine linke
+    /// Kante relativ zum ersten Tab, alle Tabs sind gleich breit (<paramref name="slot"/> samt Abstand).
+    /// </summary>
+    public static int DropIndex(double left, double slot, int count)
+    {
+        if (count <= 0 || slot <= 0) return 0;
+        return Math.Clamp((int)Math.Floor(left / slot + 0.5), 0, count - 1);
+    }
 }

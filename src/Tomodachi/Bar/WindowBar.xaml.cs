@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
@@ -31,7 +32,7 @@ public sealed class BarTab(nint handle) : Observable
 /// <summary>
 /// Obere Leiste über die ganze Breite des Notch-Monitors, mit der Notch in der Mitte. Offene Fenster als Tabs links der
 /// Notch (Icon + Titel), das aktive hervorgehoben. Klick holt nach vorn bzw. minimiert das aktive, Rechtsklick öffnet das
-/// <see cref="WindowMenu"/>. Reserviert keinen Platz: Wie die Notch liegt sie über den Fenstern und blendet sich mit ihr
+/// <see cref="WindowMenu"/>, Ziehen sortiert die Tabs um (Wunsch von deadprocess). Reserviert keinen Platz: Wie die Notch liegt sie über den Fenstern und blendet sich mit ihr
 /// aus, sobald ein Fenster maximiert oder im Vollbild ist oder die Snap-Leiste erscheint (Wunsch von deadprocess:
 /// „gleiches Spiel wie Notch only“). Aktualisiert alle 500 ms, aber nur solange sie sichtbar ist.
 /// </summary>
@@ -40,6 +41,7 @@ public partial class WindowBar : OverlayWindow
     private const double NotchMargin = 16; // Abstand der Tabs zur Notch, auch beim Hover-Wachsen
 
     private static readonly IEasingFunction Ease = new CubicEase { EasingMode = EasingMode.EaseOut };
+    private static readonly TimeSpan SlideDuration = TimeSpan.FromMilliseconds(150);
 
     private readonly List<BarTab> _tabs = [];
     private readonly ObservableCollection<BarTab> _left = [];
@@ -49,6 +51,12 @@ public partial class WindowBar : OverlayWindow
     private TomodachiConfig? _config;
     private bool _enabled = true;
     private bool _suppressed;
+
+    // Umsortieren per Ziehen
+    private BarTab? _pressed;   // linke Taste auf diesem Tab gedrückt, aber noch nicht weit genug bewegt
+    private Point _pressPoint;
+    private double _grabOffset; // wo im Tab gegriffen wurde
+    private BarTab? _dragged;
 
     public WindowBar()
     {
@@ -128,6 +136,8 @@ public partial class WindowBar : OverlayWindow
 
     private void Refresh()
     {
+        if (_dragged is not null) return; // sonst springt der gezogene Tab unter der Maus weg
+
         var snapshot = _windows.Snapshot();
         var foreground = Native.GetForegroundWindow();
         var byHandle = snapshot.ToDictionary(w => w.Handle);
@@ -183,6 +193,108 @@ public partial class WindowBar : OverlayWindow
         if (sender is not FrameworkElement { Tag: nint hwnd } tab) return;
         e.Handled = true;
         WindowMenu.Show(tab, hwnd, _config);
+    }
+
+    private void OnTabPressed(object sender, MouseButtonEventArgs e)
+    {
+        if (sender is not FrameworkElement { DataContext: BarTab tab } || Container(tab) is not { } container) return;
+        _pressed = tab;
+        _pressPoint = e.GetPosition(LeftTabs);
+        _grabOffset = e.GetPosition(container).X;
+    }
+
+    /// <summary>
+    /// Erst ab ein paar Pixeln wird aus dem Klick ein Ziehen. Dann hängt der Tab an der Maus, die anderen rutschen zur
+    /// Seite, sobald seine Mitte über ihrem Platz liegt. Die Maus hängt dabei an der ganzen Reihe, sodass der Tab das
+    /// Loslassen nicht als Klick sieht.
+    /// </summary>
+    private void OnTabsMouseMove(object sender, MouseEventArgs e)
+    {
+        if (_dragged is null)
+        {
+            if (_pressed is null) return;
+            if (e.LeftButton != MouseButtonState.Pressed)
+            {
+                _pressed = null;
+                return;
+            }
+            if (Math.Abs(e.GetPosition(LeftTabs).X - _pressPoint.X) < SystemParameters.MinimumHorizontalDragDistance) return;
+            _dragged = _pressed;
+            _pressed = null;
+            LeftTabs.CaptureMouse();
+        }
+
+        if (Container(_dragged) is not { } container || VisualTreeHelper.GetParent(container) is not UIElement row) return;
+        var slot = container.ActualWidth; // alle Tabs gleich breit
+        var left = Math.Clamp(e.GetPosition(row).X - _grabOffset, 0, (_tabs.Count - 1) * slot);
+        var from = _tabs.IndexOf(_dragged);
+        var to = BarLayout.DropIndex(left, slot, _tabs.Count);
+        if (from >= 0 && to != from) MoveTab(from, to);
+
+        container = Container(_dragged) ?? container;
+        Panel.SetZIndex(container, 1);
+        var shift = Shift(container);
+        shift.BeginAnimation(TranslateTransform.XProperty, null);
+        shift.X = left - VisualTreeHelper.GetOffset(container).X;
+    }
+
+    /// <summary>Verschiebt den Tab und lässt die übersprungenen weich an ihren neuen Platz gleiten.</summary>
+    private void MoveTab(int from, int to)
+    {
+        var before = _left.ToDictionary(t => t, VisualX);
+        _tabs.RemoveAt(from);
+        _tabs.Insert(to, _dragged!);
+        _left.Move(from, to);
+        LeftTabs.UpdateLayout();
+
+        foreach (var tab in _left)
+        {
+            if (tab == _dragged || Container(tab) is not { } container) continue;
+            var delta = before[tab] - VisualTreeHelper.GetOffset(container).X;
+            if (Math.Abs(delta) < 0.5) continue;
+            Shift(container).BeginAnimation(TranslateTransform.XProperty,
+                new DoubleAnimation(delta, 0, SlideDuration) { EasingFunction = Ease });
+        }
+    }
+
+    private void OnTabsReleased(object sender, MouseButtonEventArgs e)
+    {
+        _pressed = null;
+        if (_dragged is null) return;
+        e.Handled = true;
+        EndDrag();
+    }
+
+    private void OnTabsLostCapture(object sender, MouseEventArgs e) => EndDrag();
+
+    /// <summary>Tab gleitet in seinen Platz, die Leiste aktualisiert wieder. Die neue Reihenfolge hält <see cref="BarLayout.Order"/>.</summary>
+    private void EndDrag()
+    {
+        if (_dragged is not { } tab) return;
+        _dragged = null;
+        if (LeftTabs.IsMouseCaptured) LeftTabs.ReleaseMouseCapture();
+
+        if (Container(tab) is { } container)
+        {
+            var shift = Shift(container);
+            var settle = new DoubleAnimation(shift.X, 0, SlideDuration) { EasingFunction = Ease };
+            settle.Completed += (_, _) => Panel.SetZIndex(container, 0);
+            shift.BeginAnimation(TranslateTransform.XProperty, settle);
+        }
+        Dispatcher.BeginInvoke(Refresh, DispatcherPriority.Background);
+    }
+
+    private FrameworkElement? Container(BarTab tab) => LeftTabs.ItemContainerGenerator.ContainerFromItem(tab) as FrameworkElement;
+
+    /// <summary>Wo der Tab gerade zu sehen ist, samt laufender Verschiebung.</summary>
+    private double VisualX(BarTab tab) =>
+        Container(tab) is { } container ? VisualTreeHelper.GetOffset(container).X + Shift(container).X : 0;
+
+    private static TranslateTransform Shift(UIElement container)
+    {
+        if (container.RenderTransform is TranslateTransform shift) return shift;
+        container.RenderTransform = shift = new TranslateTransform();
+        return shift;
     }
 
     protected override void OnSourceInitialized(EventArgs e)
