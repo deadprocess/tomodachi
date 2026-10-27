@@ -11,3 +11,6 @@ TestResults/
 # Your own profile picture lives in %APPDATA%\tomodachi\avatar.png anyway.
 assets/avatar/reze.png
 assets/avatar/source/
+
+# Claude Code project notes (contain local machine details)
+CLAUDE.md
