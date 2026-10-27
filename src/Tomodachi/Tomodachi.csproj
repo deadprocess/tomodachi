@@ -8,6 +8,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <PlatformTarget>x64</PlatformTarget>
+    <!-- tools/publish.ps1 baut mit -r win-x64: so steht der RID-Graph in packages.lock.json (Locked-Modus) -->
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <StartupObject>Tomodachi.Program</StartupObject>

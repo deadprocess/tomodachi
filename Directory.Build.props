@@ -1,0 +1,11 @@
+<Project>
+
+  <PropertyGroup>
+    <!-- Lieferkette: Jedes Projekt hat eine packages.lock.json mit den Hashes aller (auch transitiven) Pakete.
+         RestoreLockedMode lässt den Restore scheitern, statt still andere Versionen zu ziehen.
+         Neues Paket oder Versionswechsel: einmal „dotnet restore“ mit dem Schalter force-evaluate, Lock-Datei mit committen. -->
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <RestoreLockedMode>true</RestoreLockedMode>
+  </PropertyGroup>
+
+</Project>
