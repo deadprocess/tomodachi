@@ -12,7 +12,9 @@ Ausgabegerät, WLAN, Bluetooth), Fensterliste, Einstellungen und Powermenü. Wer
 
 ## Loslegen
 
-1. `tomodachi-<Version>.zip` unter [Releases](../../releases) laden und an einen festen Ort entpacken.
+1. `tomodachi-<Version>.zip` unter [Releases](../../releases) laden und nach `C:\Programme\tomodachi` entpacken
+   (fragt einmal nach Adminrechten). Der Autostart startet genau diese Exe mit Adminrechten, deshalb gehört sie in einen
+   Ordner, den nur Admins ändern dürfen. An anderen Orten warnt tomodachi beim Einschalten des Autostarts.
 2. `tomodachi.exe` starten. SmartScreen warnt, weil die Exe nicht signiert ist: *Weitere Informationen → Trotzdem ausführen*.
 3. In den Einstellungen (⚙) **Mit Windows starten** einschalten (fragt einmal nach Adminrechten), danach dort
    **Neu starten**. Erst dann läuft tomodachi mit Adminrechten.

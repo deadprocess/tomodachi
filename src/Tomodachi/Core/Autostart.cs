@@ -17,6 +17,7 @@ internal static class Autostart
 {
     private const string TaskName = "tomodachi";
     public const string FromTaskArgument = "--from-task";
+    private const int ErrorCancelled = 1223;
 
     static Autostart() => Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
@@ -24,6 +25,7 @@ internal static class Autostart
     public static int RunCli(bool install)
     {
         if (!Elevation.IsElevated) return Elevation.RelaunchElevated(install ? "--install" : "--uninstall");
+        if (install && !ConfirmFolder()) return ErrorCancelled;
 
         var (exitCode, output) = install ? Install() : Schtasks("/Delete", "/TN", TaskName, "/F");
         var action = install ? "Autostart mit Adminrechten eingerichtet" : "Autostart entfernt";
@@ -38,6 +40,39 @@ internal static class Autostart
             System.Windows.MessageBox.Show($"{Localization.Loc.Format("Autostart_Failed", exitCode)}\n{output}", "tomodachi");
         }
         return exitCode;
+    }
+
+    /// <summary>Liegt die Exe in einem Ordner, den auch Programme ohne Adminrechte ändern dürfen, erst nachfragen.</summary>
+    private static bool ConfirmFolder()
+    {
+        var problems = WritableByNonAdmins();
+        if (problems.Count == 0) return true;
+
+        var answer = System.Windows.MessageBox.Show(
+            Localization.Loc.Format("Autostart_UnsafeFolder", string.Join("\n", problems.Take(5))), "tomodachi",
+            System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Warning, System.Windows.MessageBoxResult.No);
+        var confirmed = answer == System.Windows.MessageBoxResult.Yes;
+        Log.Warn($"Autostart in beschreibbarem Ordner {(confirmed ? "trotzdem eingerichtet" : "abgebrochen")}");
+        return confirmed;
+    }
+
+    /// <summary>
+    /// Für <see cref="ConfirmFolder"/> und den Start über die Aufgabe (Log-Warnung). Ist die Prüfung selbst nicht möglich,
+    /// wird nur geloggt: Daran soll der Autostart nicht scheitern.
+    /// </summary>
+    public static IReadOnlyList<string> WritableByNonAdmins()
+    {
+        try
+        {
+            var problems = InstallFolder.FindWritable(Environment.ProcessPath!);
+            foreach (var problem in problems) Log.Warn($"Für Nicht-Admins änderbar: {problem}");
+            return problems;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidOperationException)
+        {
+            Log.Warn("Rechte des Installationsordners nicht prüfbar", ex);
+            return [];
+        }
     }
 
     /// <summary>True, wenn die Aufgabe existiert und auf genau diese Exe zeigt.</summary>
@@ -117,15 +152,29 @@ internal static class Autostart
             """;
         // Ohne Priority 4 läuft die Aufgabe mit „below normal“ (7), und die UI würde ruckeln
 
-        var file = Path.Combine(Path.GetTempPath(), $"tomodachi-task-{Environment.ProcessId}.xml");
-        File.WriteAllText(file, xml, Encoding.Unicode);
+        return Register(xml);
+    }
+
+    /// <summary>
+    /// Über die COM-Schnittstelle der Aufgabenplanung, die XML als String. Nicht über eine Datei in %TEMP% und
+    /// <c>schtasks /Create /XML</c>: Zwischen Schreiben und Einlesen könnte jedes Programm des Users die Datei austauschen
+    /// und so eine eigene Aufgabe mit höchsten Rechten anlegen lassen.
+    /// </summary>
+    private static (int ExitCode, string Output) Register(string xml)
+    {
+        const int TASK_CREATE_OR_UPDATE = 6;
+        const int TASK_LOGON_INTERACTIVE_TOKEN = 3;
         try
         {
-            return Schtasks("/Create", "/TN", TaskName, "/XML", file, "/F");
+            dynamic service = Activator.CreateInstance(Type.GetTypeFromProgID("Schedule.Service", throwOnError: true)!)!;
+            service.Connect();
+            dynamic folder = service.GetFolder(@"\");
+            dynamic task = folder.RegisterTask(TaskName, xml, TASK_CREATE_OR_UPDATE, null, null, TASK_LOGON_INTERACTIVE_TOKEN, null);
+            return (0, $"Aufgabe {(string)task.Path} angelegt");
         }
-        finally
+        catch (Exception ex)
         {
-            File.Delete(file);
+            return (ex.HResult, $"0x{ex.HResult:X8}: {ex.Message}");
         }
     }
 

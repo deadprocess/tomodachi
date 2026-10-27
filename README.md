@@ -29,8 +29,9 @@ The UI is available in English and German (follows Windows, or pick one in Setti
 
 ## Install
 
-1. Download `tomodachi-<version>.zip` from [Releases](../../releases) and unzip it somewhere permanent
-   (not *Downloads*; autostart remembers the path).
+1. Download `tomodachi-<version>.zip` from [Releases](../../releases) and unzip it to `C:\Program Files\tomodachi`
+   (Windows asks for admin rights once). Autostart remembers the path and starts that exe with admin rights, so it
+   belongs in a folder only admins can change. tomodachi warns when you turn on autostart from anywhere else.
 2. Run `tomodachi.exe`. Windows SmartScreen will warn because the exe isn't signed: *More info → Run anyway*.
 3. Open Settings (⚙) and turn on **Start with Windows**. It asks for admin rights once. Then press **Restart** in Settings
    (or sign in again): from now on tomodachi runs with admin rights, and only then does the Win key also work while an
@@ -71,6 +72,9 @@ tomodachi hooks the keyboard and can run as admin, so here is exactly what it do
 - **Admin rights are optional.** They're only used so the Win key also works while an admin window or a game with
   anti-cheat is focused. They come from a Task Scheduler entry you enable in Settings and can remove any time.
   Apps you start from the launcher run *without* admin rights unless you pick *Run as administrator*.
+  So that no other program can sneak in through that entry: the exe and its DLLs come from the install folder only
+  (nothing is unpacked to `%TEMP%`), .NET startup hooks from environment variables are switched off, the task is
+  registered without a temporary file, and turning on autostart from a folder non-admins can change asks first.
 - **System changes are reversible.** It changes the taskbar (auto-hide, hidden windows), and, only when you ask,
   the autostart task, your wallpaper, volume, default output device and Wi-Fi/Bluetooth (quick settings change
   exactly what you click, like Windows' own quick settings would, and aren't undone on quit). Taskbar changes go to a restore journal first and are undone on quit,
@@ -92,7 +96,7 @@ Needs the .NET 10 SDK.
 ```powershell
 dotnet build Tomodachi.slnx
 dotnet test Tomodachi.slnx
-.\tools\publish.ps1          # dist\tomodachi-<version>.zip: single self-contained exe + readme + licenses
+.\tools\publish.ps1          # dist\tomodachi-<version>.zip: self-contained exe + native WPF DLLs + readme + licenses
 .\tools\update-install.ps1   # replace the installed exe (the one autostart points to) with the newest build
 ```
 

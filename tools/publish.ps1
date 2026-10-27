@@ -1,5 +1,5 @@
-﻿# Baut tomodachi zum Weitergeben: eine einzelne, eigenständige tomodachi.exe (läuft ohne installiertes .NET),
-# dazu LIES-MICH.txt und DRITTANBIETER-LIZENZEN.txt, gepackt als dist\tomodachi-<Version>.zip.
+﻿# Baut tomodachi zum Weitergeben: eine eigenständige tomodachi.exe (läuft ohne installiertes .NET) mit den nativen
+# WPF-DLLs daneben, dazu LIES-MICH.txt und DRITTANBIETER-LIZENZEN.txt, gepackt als dist\tomodachi-<Version>.zip.
 #
 #   .\tools\publish.ps1
 #
@@ -25,8 +25,11 @@ $staging = Join-Path (Resolve-Path $Out).Path "tomodachi-$version"
 if (Test-Path $staging) { Remove-Item $staging -Recurse -Force }
 
 Write-Host "Baue tomodachi $version …"
+# Native DLLs bewusst NICHT in die Exe (kein IncludeNativeLibrariesForSelfExtract): .NET würde sie bei jedem Start nach
+# %TEMP%\.net\tomodachi entpacken, ungeprüft wiederverwenden und in den elevated Prozess laden. Dort kann jedes Programm
+# des Users sie austauschen und so ohne UAC-Abfrage an Adminrechte kommen. Neben der Exe schützt sie der Installationsordner.
 dotnet publish $project -c Release -r win-x64 --self-contained `
-    -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true `
+    -p:PublishSingleFile=true -p:EnableCompressionInSingleFile=true `
     -p:DebugType=none -o $staging -v q -nologo
 if ($LASTEXITCODE -ne 0) { throw "dotnet publish fehlgeschlagen ($LASTEXITCODE)" }
 

@@ -20,8 +20,9 @@ Dazu: Win+W öffnet die Widgets, Win+Strg+W einen Wallpaper-Wechsler
 
 LOSLEGEN
 --------
-1. Den Ordner an einen festen Ort legen, z. B. C:\Programme-eigene\tomodachi
-   (nicht in „Downloads“ lassen, der Autostart merkt sich den Pfad).
+1. Den Ordner nach C:\Programme\tomodachi verschieben (fragt einmal nach
+   Adminrechten). Der Autostart startet tomodachi.exe von dort mit Adminrechten,
+   deshalb gehört sie in einen Ordner, den nur Admins ändern dürfen.
 2. tomodachi.exe doppelklicken.
    Windows warnt evtl. „Der Computer wurde durch Windows geschützt“: Die Exe ist
    nicht signiert. „Weitere Informationen“ → „Trotzdem ausführen“.

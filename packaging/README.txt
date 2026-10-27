@@ -20,8 +20,9 @@ Also: Win+W opens the widgets, Win+Ctrl+W a wallpaper picker (images from the
 
 GETTING STARTED
 ---------------
-1. Put this folder somewhere permanent, e.g. C:\Tools\tomodachi
-   (not in Downloads, autostart remembers the path).
+1. Move this folder to C:\Program Files\tomodachi (Windows asks for admin
+   rights once). Autostart starts tomodachi.exe from there with admin rights,
+   so it belongs in a folder only admins can change.
 2. Double-click tomodachi.exe.
    Windows may say "Windows protected your PC": the exe isn't signed.
    "More info" → "Run anyway".

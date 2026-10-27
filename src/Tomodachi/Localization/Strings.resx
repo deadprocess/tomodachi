@@ -106,4 +106,13 @@
   <data name="Autostart_Installed" xml:space="preserve"><value>tomodachi now starts with Windows (with admin rights).</value></data>
   <data name="Autostart_Removed" xml:space="preserve"><value>tomodachi no longer starts with Windows.</value></data>
   <data name="Autostart_Failed" xml:space="preserve"><value>tomodachi: setting up autostart failed ({0}).</value></data>
+  <data name="Autostart_UnsafeFolder" xml:space="preserve"><value>tomodachi is in a folder that programs without admin rights can change:
+
+{0}
+
+Autostart runs tomodachi with admin rights and without asking. Any program could swap the exe there and get admin rights the same way.
+
+Better: move the tomodachi folder to C:\Program Files first, then turn on autostart from there.
+
+Set up autostart anyway?</value></data>
 </root>

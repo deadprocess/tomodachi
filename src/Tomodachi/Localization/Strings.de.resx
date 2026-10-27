@@ -106,4 +106,13 @@
   <data name="Autostart_Installed" xml:space="preserve"><value>tomodachi startet jetzt mit Windows (mit Adminrechten).</value></data>
   <data name="Autostart_Removed" xml:space="preserve"><value>tomodachi startet nicht mehr mit Windows.</value></data>
   <data name="Autostart_Failed" xml:space="preserve"><value>tomodachi: Autostart einrichten fehlgeschlagen ({0}).</value></data>
+  <data name="Autostart_UnsafeFolder" xml:space="preserve"><value>tomodachi liegt in einem Ordner, den auch Programme ohne Adminrechte ändern dürfen:
+
+{0}
+
+Der Autostart startet tomodachi ohne Nachfrage mit Adminrechten. Jedes Programm könnte dort die Exe austauschen und käme so ebenfalls an Adminrechte.
+
+Besser: den tomodachi-Ordner erst nach C:\Programme (C:\Program Files) verschieben und den Autostart von dort einschalten.
+
+Trotzdem einrichten?</value></data>
 </root>
