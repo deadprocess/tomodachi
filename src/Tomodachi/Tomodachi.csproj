@@ -22,6 +22,9 @@
     <!-- Läuft über die Aufgabe elevated, erbt aber die Umgebung des Users (HKCU\Environment). DOTNET_STARTUP_HOOKS dürfte
          sonst jedes Programm des Users setzen und damit eigenen Code in den Admin-Prozess laden. -->
     <StartupHookSupport>false</StartupHookSupport>
+    <!-- publish.ps1 baut als Single-File; der Analyzer dazu zieht Microsoft.NET.ILLink.Tasks. Immer an, damit die
+         Lock-Datei für Build, Test und Publish dieselbe ist (sonst scheitert Publish im Locked-Modus mit NU1004). -->
+    <EnableSingleFileAnalyzer>true</EnableSingleFileAnalyzer>
   </PropertyGroup>
 
   <ItemGroup>
