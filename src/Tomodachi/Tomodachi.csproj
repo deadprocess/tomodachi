@@ -13,7 +13,7 @@
     <StartupObject>Tomodachi.Program</StartupObject>
     <AssemblyName>tomodachi</AssemblyName>
     <RootNamespace>Tomodachi</RootNamespace>
-    <Version>1.3.0</Version>
+    <Version>1.4.0</Version>
     <!-- Oberfläche: Englisch im Haupt-Assembly, Deutsch als Satellit (Localization/Strings.de.resx) -->
     <NeutralLanguage>en</NeutralLanguage>
     <SatelliteResourceLanguages>en;de</SatelliteResourceLanguages>

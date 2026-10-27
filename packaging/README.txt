@@ -53,8 +53,8 @@ UNINSTALL
 GOOD TO KNOW
 ------------
 - Windows 10/11, 64-bit only. English or German UI (follows Windows).
-- Over games, videos and maximized windows bar and notch hide. A Win tap still
-  brings both up.
+- Over games, videos and maximized windows bar and notch hide. A Win tap, or the
+  mouse resting at the top edge above the notch, still brings both up.
 - CPU temperatures need the optional PawnIO driver (https://pawnio.eu).
 - Problems? Settings → Logs, send the newest file.
 

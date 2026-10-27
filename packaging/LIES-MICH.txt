@@ -54,7 +54,8 @@ GUT ZU WISSEN
 -------------
 - Nur Windows 10/11, 64 Bit. Oberfläche auf Deutsch.
 - Läuft ein Spiel oder Video im Vollbild, oder ist ein Fenster maximiert, verstecken
-  sich Leiste und Notch. Ein Win-Tipp holt beide trotzdem hervor.
+  sich Leiste und Notch. Ein Win-Tipp oder die Maus oben am Rand über der Notch
+  holt beide trotzdem hervor.
 - CPU-Temperaturen gibt es nur mit dem optionalen Treiber PawnIO (https://pawnio.eu),
   alles andere geht ohne.
 - Eigenes Profilbild: Einstellungen → Profilbild → „Bild wählen …“

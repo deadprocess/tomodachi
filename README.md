@@ -23,7 +23,7 @@ app launcher, widgets, a window list, settings and a power menu.
 | **Settings** | Bar with notch or notch only, profile picture, notch monitor, language, Win key, taskbar, autostart, wallpaper folder. No config files needed. |
 | **Wallpapers** | Win+Ctrl+W opens a full-screen strip of slanted wallpaper cards; Enter applies the picture. |
 | **Taskbar** | Gone while tomodachi runs, back the moment it quits. |
-| **Fullscreen** | Bar and notch hide over games, videos, maximized windows and Windows 11's snap bar; nothing reserves screen space. A Win tap still brings both up. |
+| **Fullscreen** | Bar and notch hide over games, videos, maximized windows and Windows 11's snap bar; nothing reserves screen space. A Win tap, or resting the mouse at the top edge above the notch, still brings both up. |
 
 The UI is available in English and German (follows Windows, or pick one in Settings).
 
