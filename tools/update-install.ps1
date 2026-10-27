@@ -24,6 +24,8 @@ if (-not $InstallDir) {
     $InstallDir = Split-Path $exe
 }
 if ($InstallDir.TrimEnd('\') -like "$($env:SystemRoot)*") { throw "Installationsordner $InstallDir liegt unter Windows, hier wird nichts kopiert." }
+# Copy-Item onto a missing folder would write every file to one file named like the folder
+if (-not (Test-Path -LiteralPath $InstallDir -PathType Container)) { throw "Installationsordner $InstallDir gibt es nicht. Ohne -InstallDir nimmt das Skript den Ordner aus der Autostart-Aufgabe." }
 
 # In Program Files darf nur ein Admin schreiben: einmal per UAC neu starten
 $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(
@@ -38,7 +40,8 @@ if (-not $isAdmin) {
 Start-Transcript -Path (Join-Path $env:TEMP 'tomodachi-update.log') -Force | Out-Null
 trap {
     Write-Host "Fehler: $_" -ForegroundColor Red
-    Stop-Transcript | Out-Null
+    # The trap also covers errors before Start-Transcript (it applies to the whole script)
+    try { Stop-Transcript | Out-Null } catch {}
     Read-Host 'Enter zum Schließen'
     exit 1
 }

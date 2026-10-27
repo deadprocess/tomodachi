@@ -105,9 +105,25 @@ public class LocalizationTests
         Assert.Equal("Windows", Loc.Get("Tab_Windows", CultureInfo.GetCultureInfo("en-US")));
     }
 
-    private static List<string> Keys(string file)
+    /// <summary>A placeholder missing in one language would drop text or throw in string.Format.</summary>
+    [Fact]
+    public void EveryText_HasTheSamePlaceholdersInBothLanguages()
+    {
+        var neutral = Texts("Strings.resx");
+        var german = Texts("Strings.de.resx");
+        foreach (var (key, text) in neutral)
+            Assert.True(Placeholders(text).SequenceEqual(Placeholders(german[key])), $"{key}: placeholders differ");
+    }
+
+    private static IEnumerable<string> Placeholders(string text) =>
+        System.Text.RegularExpressions.Regex.Matches(text, @"\{\d+\}").Select(m => m.Value).Distinct().Order();
+
+    private static List<string> Keys(string file) => Texts(file).Keys.ToList();
+
+    private static Dictionary<string, string> Texts(string file)
     {
         var path = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "src", "Tomodachi", "Localization", file);
-        return System.Xml.Linq.XDocument.Load(path).Root!.Elements("data").Select(d => (string)d.Attribute("name")!).ToList();
+        return System.Xml.Linq.XDocument.Load(path).Root!.Elements("data")
+            .ToDictionary(d => (string)d.Attribute("name")!, d => (string?)d.Element("value") ?? "");
     }
 }

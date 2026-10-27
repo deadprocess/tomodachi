@@ -110,13 +110,29 @@
 
 {0}
 
-Der Autostart startet tomodachi ohne Nachfrage mit Adminrechten. Jedes Programm könnte dort die Exe austauschen und käme so ebenfalls an Adminrechte.
+Der Autostart startet tomodachi ohne Nachfrage mit Adminrechten. Jedes Programm, das unter deinem Konto läuft, könnte dort die Exe oder eine DLL austauschen und hätte beim nächsten Start Adminrechte.
 
 {1}
 
 Trotzdem einrichten?</value></data>
-  <data name="Autostart_UnsafeFolder_Move" xml:space="preserve"><value>Besser: den tomodachi-Ordner erst nach C:\Programme (C:\Program Files) kopieren oder das ZIP dort entpacken (nicht verschieben, das behält die alten Rechte) und den Autostart von dort einschalten.</value></data>
-  <data name="Autostart_UnsafeFolder_Reset" xml:space="preserve"><value>Der Ordner liegt schon unter C:\Programme, aber die Dateien haben noch die Rechte des Ordners, aus dem sie verschoben wurden. Besser: in einer Admin-PowerShell die Rechte zurücksetzen und den Autostart danach einschalten:
-icacls "{0}" /setowner Administratoren /T /C
+  <data name="Autostart_UnsafeFolder_ResetAsk" xml:space="preserve"><value>tomodachi liegt unter C:\Programme, aber Programme ohne Adminrechte dürfen diese Dateien trotzdem ändern:
+
+{0}
+
+Das passiert meist, wenn der Ordner dorthin verschoben statt kopiert wurde: Verschieben behält die alten Rechte.
+
+Der Autostart startet tomodachi ohne Nachfrage mit Adminrechten. Jedes Programm, das unter deinem Konto läuft, könnte dort die Exe oder eine DLL austauschen und hätte beim nächsten Start Adminrechte.
+
+tomodachi kann die Rechte jetzt zurücksetzen. Danach gelten dieselben Rechte wie im restlichen C:\Programme, wie nach einer frischen Installation.
+
+Rechte zurücksetzen und Autostart einrichten?</value></data>
+  <data name="Autostart_ResetFailed" xml:space="preserve"><value>Rechte zurücksetzen hat nicht geklappt:
+
+{0}</value></data>
+  <data name="Autostart_UnsafeFolder_Move" xml:space="preserve"><value>Empfohlen: den tomodachi-Ordner nach C:\Programme kopieren oder das ZIP dort entpacken (nicht verschieben, das behält die alten Rechte) und den Autostart von dort einschalten.</value></data>
+  <data name="Autostart_UnsafeFolder_Reset" xml:space="preserve"><value>tomodachi konnte die Rechte nicht selbst zurücksetzen. Von Hand geht es in einer Admin-PowerShell, danach den Autostart erneut einschalten (Strg+C kopiert diese ganze Meldung):
+
+icacls "{0}" /setowner *S-1-5-32-544 /T /C
 icacls "{0}" /reset /T /C</value></data>
+  <data name="Autostart_MoreProblems" xml:space="preserve"><value>… und {0} weitere</value></data>
 </root>

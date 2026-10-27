@@ -110,13 +110,29 @@
 
 {0}
 
-Autostart runs tomodachi with admin rights and without asking. Any program could swap the exe there and get admin rights the same way.
+Autostart runs tomodachi with admin rights and without asking. Any program running under your account could replace the exe or a DLL there and would get admin rights at the next start.
 
 {1}
 
 Set up autostart anyway?</value></data>
-  <data name="Autostart_UnsafeFolder_Move" xml:space="preserve"><value>Better: copy the tomodachi folder to C:\Program Files or unzip it there first (don't move it, a move keeps the old permissions), then turn on autostart from there.</value></data>
-  <data name="Autostart_UnsafeFolder_Reset" xml:space="preserve"><value>The folder is already under C:\Program Files, but the files still carry the permissions of the folder they were moved from. Better: reset them in an admin PowerShell, then turn on autostart:
-icacls "{0}" /setowner Administrators /T /C
+  <data name="Autostart_UnsafeFolder_ResetAsk" xml:space="preserve"><value>tomodachi is under Program Files, but programs without admin rights can still change these files:
+
+{0}
+
+This usually happens when the folder was moved there instead of copied: a move keeps the old permissions.
+
+Autostart runs tomodachi with admin rights and without asking. Any program running under your account could replace the exe or a DLL there and would get admin rights at the next start.
+
+tomodachi can reset the permissions now. Afterwards they are the same as for the rest of Program Files, like after a fresh install.
+
+Reset permissions and set up autostart?</value></data>
+  <data name="Autostart_ResetFailed" xml:space="preserve"><value>Resetting the permissions did not work:
+
+{0}</value></data>
+  <data name="Autostart_UnsafeFolder_Move" xml:space="preserve"><value>Recommended: copy the tomodachi folder to Program Files or unzip it there (don't move it, a move keeps the old permissions), then turn on autostart from there.</value></data>
+  <data name="Autostart_UnsafeFolder_Reset" xml:space="preserve"><value>tomodachi could not reset the permissions automatically. You can do it by hand in an admin PowerShell and then turn on autostart again (Ctrl+C copies this whole message):
+
+icacls "{0}" /setowner *S-1-5-32-544 /T /C
 icacls "{0}" /reset /T /C</value></data>
+  <data name="Autostart_MoreProblems" xml:space="preserve"><value>… and {0} more</value></data>
 </root>

@@ -63,14 +63,40 @@ internal static class Autostart
         var problems = WritableByNonAdmins();
         if (problems.Count == 0) return true;
 
-        // Under Program Files the folder itself is fine and the files carry stale ACLs (typically from a move):
-        // advise a permission reset there, a copy to Program Files everywhere else.
+        // Under Program Files the parent folders are admin-only and the files carry stale ACLs (typically from a move).
+        // We are already elevated here, so offer to reset them instead of making the user type icacls commands.
         var folder = Path.GetDirectoryName(Environment.ProcessPath!)!;
-        var advice = InstallFolder.IsUnderProgramFiles(folder)
+        var underProgramFiles = InstallFolder.IsUnderProgramFiles(folder);
+        if (underProgramFiles)
+        {
+            var reset = System.Windows.MessageBox.Show(
+                Localization.Loc.Format("Autostart_UnsafeFolder_ResetAsk", DescribeProblems(problems, MoreProblems)), "tomodachi",
+                System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Warning, System.Windows.MessageBoxResult.Yes);
+            if (reset != System.Windows.MessageBoxResult.Yes)
+            {
+                Log.Warn("Autostart in beschreibbarem Ordner abgebrochen");
+                return false;
+            }
+
+            // icacls /C reports exit code 0 even when every file failed, so only the re-check decides
+            var (exitCode, output) = ResetPermissions(folder);
+            problems = WritableByNonAdmins();
+            if (problems.Count == 0)
+            {
+                Log.Info($"Rechte von {folder} zurückgesetzt");
+                return true;
+            }
+            Log.Error($"Rechte zurücksetzen fehlgeschlagen ({exitCode}): {output}");
+            System.Windows.MessageBox.Show(Localization.Loc.Format("Autostart_ResetFailed", FirstLines(output, 10)), "tomodachi",
+                System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+        }
+
+        // Fallback: explain and let the user decide (copy to Program Files, or the manual icacls commands)
+        var advice = underProgramFiles
             ? Localization.Loc.Format("Autostart_UnsafeFolder_Reset", folder)
             : Localization.Loc.Get("Autostart_UnsafeFolder_Move");
         var answer = System.Windows.MessageBox.Show(
-            Localization.Loc.Format("Autostart_UnsafeFolder", string.Join("\n", problems.Take(5)), advice), "tomodachi",
+            Localization.Loc.Format("Autostart_UnsafeFolder", DescribeProblems(problems, MoreProblems), advice), "tomodachi",
             System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Warning, System.Windows.MessageBoxResult.No);
         var confirmed = answer == System.Windows.MessageBoxResult.Yes;
         Log.Warn($"Autostart in beschreibbarem Ordner {(confirmed ? "trotzdem eingerichtet" : "abgebrochen")}");
@@ -219,9 +245,64 @@ internal static class Autostart
         }
     }
 
-    private static (int ExitCode, string Output) Schtasks(params string[] args)
+    private static string MoreProblems(int count) => Localization.Loc.Format("Autostart_MoreProblems", count);
+
+    /// <summary>
+    /// For the dialog: each affected path once (the log keeps the account and rights per entry), grouped by folder so
+    /// the long folder path appears once and the narrow message box doesn't wrap inside file names. At most
+    /// <paramref name="max"/> names, plus an "and N more" line. Entries look like <c>path (account: rights)</c>;
+    /// the last " (" splits them, since a path may itself contain " (" (Program Files (x86)).
+    /// </summary>
+    internal static string DescribeProblems(IReadOnlyList<string> problems, Func<int, string> more, int max = 5)
     {
-        var info = new ProcessStartInfo(Path.Combine(Environment.SystemDirectory, "schtasks.exe"))
+        var paths = problems
+            .Select(p => p.LastIndexOf(" (", StringComparison.Ordinal) is var i and > 0 ? p[..i] : p)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        var lines = new List<string>();
+        string? folder = null;
+        foreach (var path in paths.Take(max))
+        {
+            var parent = Path.GetDirectoryName(path);
+            if (parent is null)
+            {
+                lines.Add(path); // a drive root has no parent
+                folder = null;
+                continue;
+            }
+            if (!string.Equals(parent, folder, StringComparison.OrdinalIgnoreCase)) lines.Add(parent);
+            folder = parent;
+            lines.Add("    " + Path.GetFileName(path));
+        }
+        if (paths.Count > max) lines.Add(more(paths.Count - max));
+        return string.Join("\n", lines);
+    }
+
+    /// <summary>icacls lists every file it touched; the dialog only needs the start.</summary>
+    internal static string FirstLines(string text, int count)
+    {
+        var lines = text.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        return string.Join("\n", lines.Take(count)) + (lines.Length > count ? "\n…" : "");
+    }
+
+    /// <summary>
+    /// Makes Administrators the owner of the folder and everything in it, then drops all explicit ACEs so the tree
+    /// inherits the admin-only permissions of Program Files again. Only called for folders under Program Files.
+    /// The SID instead of a group name, because the name is localized ("Administratoren").
+    /// </summary>
+    private static (int ExitCode, string Output) ResetPermissions(string folder)
+    {
+        var owner = RunSystemTool("icacls.exe", folder, "/setowner", "*S-1-5-32-544", "/T", "/C", "/Q");
+        var reset = RunSystemTool("icacls.exe", folder, "/reset", "/T", "/C", "/Q");
+        return (owner.ExitCode != 0 ? owner.ExitCode : reset.ExitCode, $"{owner.Output}\n{reset.Output}".Trim());
+    }
+
+    private static (int ExitCode, string Output) Schtasks(params string[] args) => RunSystemTool("schtasks.exe", args);
+
+    private static (int ExitCode, string Output) RunSystemTool(string tool, params string[] args)
+    {
+        var info = new ProcessStartInfo(Path.Combine(Environment.SystemDirectory, tool))
         {
             UseShellExecute = false,
             CreateNoWindow = true,

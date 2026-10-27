@@ -26,7 +26,8 @@ GETTING STARTED
    the admin-only permissions of Program Files.
    Autostart starts tomodachi.exe from there with admin rights, so it belongs
    in a folder only admins can change.
-   Already moved it? Reset the permissions in an admin PowerShell:
+   Already moved it? When you turn on autostart, tomodachi offers to reset
+   the permissions itself. By hand, in an admin PowerShell:
      icacls "C:\Program Files\tomodachi" /setowner Administrators /T /C
      icacls "C:\Program Files\tomodachi" /reset /T /C
 2. Double-click tomodachi.exe.

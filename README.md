@@ -33,8 +33,8 @@ The UI is available in English and German (follows Windows, or pick one in Setti
    `C:\Program Files\tomodachi` (Windows asks for admin rights once). Autostart remembers the path and starts that exe
    with admin rights, so it belongs in a folder only admins can change. tomodachi warns when you turn on autostart from
    anywhere else. Unzip or copy, don't move: a move within the same drive keeps the file permissions of the source
-   folder, and tomodachi will warn even though the path says Program Files. If that happened, reset them from an admin
-   PowerShell:
+   folder, and tomodachi will warn even though the path says Program Files. If that happened, tomodachi offers to reset
+   the permissions when you turn on autostart. To do it by hand, from an admin PowerShell:
 
    ```powershell
    icacls "C:\Program Files\tomodachi" /setowner Administrators /T /C

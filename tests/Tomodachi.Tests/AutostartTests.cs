@@ -7,6 +7,41 @@ public class AutostartTests
 {
     private const string Exe = @"C:\Program Files\tomodachi\tomodachi.exe";
 
+    [Fact]
+    public void DescribeProblems_ListsEachPathOnce()
+    {
+        string[] problems =
+        [
+            @"C:\Program Files\t\a.dll (HELL\user, owner)",
+            @"C:\Program Files\t\a.dll (HELL\user: FullControl)",
+            @"C:\Program Files\t\a.dll (HELL\user: FullControl)",
+            @"C:\Program Files (x86)\t\b.dll (HELL\user: FullControl)",
+        ];
+
+        var text = Autostart.DescribeProblems(problems, n => $"+{n}");
+
+        Assert.Equal(string.Join("\n",
+            @"C:\Program Files\t", "    a.dll",
+            @"C:\Program Files (x86)\t", "    b.dll"), text);
+    }
+
+    [Fact]
+    public void DescribeProblems_ShowsTheFolderOnceAndCountsTheRest()
+    {
+        var problems = Enumerable.Range(1, 8).Select(i => $@"C:\t\f{i}.dll (HELL\user, owner)").ToList();
+
+        var lines = Autostart.DescribeProblems(problems, n => $"+{n}", max: 5).Split('\n');
+
+        Assert.Equal([@"C:\t", "    f1.dll", "    f2.dll", "    f3.dll", "    f4.dll", "    f5.dll", "+3"], lines);
+    }
+
+    [Fact]
+    public void FirstLines_TruncatesLongOutput()
+    {
+        Assert.Equal("a\nb\n…", Autostart.FirstLines("a\r\nb\r\nc\r\n", 2));
+        Assert.Equal("a", Autostart.FirstLines("a\r\n", 2));
+    }
+
     [Theory]
     [InlineData("CORECLR_ENABLE_PROFILING")]
     [InlineData("CORECLR_PROFILER")]

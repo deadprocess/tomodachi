@@ -12,9 +12,17 @@ Ausgabegerät, WLAN, Bluetooth), Fensterliste, Einstellungen und Powermenü. Wer
 
 ## Loslegen
 
-1. `tomodachi-<Version>.zip` unter [Releases](../../releases) laden und nach `C:\Programme\tomodachi` entpacken
+1. `tomodachi-<Version>.zip` unter [Releases](../../releases) laden und direkt nach `C:\Programme\tomodachi` entpacken
    (fragt einmal nach Adminrechten). Der Autostart startet genau diese Exe mit Adminrechten, deshalb gehört sie in einen
    Ordner, den nur Admins ändern dürfen. An anderen Orten warnt tomodachi beim Einschalten des Autostarts.
+   Entpacken oder kopieren, nicht verschieben: Verschieben auf demselben Laufwerk behält die Dateirechte des alten
+   Ordners, dann warnt tomodachi auch unter `C:\Programme`. In dem Fall bietet tomodachi beim Einschalten des Autostarts
+   an, die Rechte zurückzusetzen. Von Hand geht es in einer Admin-PowerShell:
+
+   ```powershell
+   icacls "C:\Program Files\tomodachi" /setowner Administratoren /T /C
+   icacls "C:\Program Files\tomodachi" /reset /T /C
+   ```
 2. `tomodachi.exe` starten. SmartScreen warnt, weil die Exe nicht signiert ist: *Weitere Informationen → Trotzdem ausführen*.
 3. In den Einstellungen (⚙) **Mit Windows starten** einschalten (fragt einmal nach Adminrechten), danach dort
    **Neu starten**. Erst dann läuft tomodachi mit Adminrechten.
