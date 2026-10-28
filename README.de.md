@@ -8,7 +8,13 @@ Ausgabegerät, WLAN, Bluetooth), Fensterliste, Einstellungen und Powermenü. Wer
 
 > **Zum Projekt.** tomodachi wurde komplett von einer KI (Claude von Anthropic) im Gespräch mit mir programmiert.
 > Ich habe entschieden, was es können und wie es sich anfühlen soll, jede Version auf meinem PC getestet und Fehler
-> gemeldet. Den Code habe ich nicht gelesen. Es ist meine persönliche Shell, geteilt, wie sie ist.
+> gemeldet. Den Code habe ich nicht gelesen. Es ist meine persönliche Shell, die ich täglich nutze und weiterpflege,
+> geteilt, falls sie jemandem nützt.
+>
+> Was das heißt: tomodachi hängt sich in die Tastatur und kann mit Adminrechten laufen, und niemand Unabhängiges hat
+> den Code geprüft. Die Angaben zu Sicherheit und Datenschutz in der [englischen README](README.md#security--privacy)
+> wurden von derselben KI gegen den Code geprüft, die ihn geschrieben hat. Wer es erhöht laufen lassen will, sollte
+> vorher selbst in [`src/`](src) schauen – oder es lassen.
 
 ## Loslegen
 

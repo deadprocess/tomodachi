@@ -8,7 +8,12 @@ app launcher, widgets, a window list, settings and a power menu.
 
 > **About this project.** tomodachi was built entirely by an AI coding assistant (Claude, by Anthropic) in a long
 > conversation with me. I decided what it should do and how it should feel, tested every build on my own PC and reported
-> what broke. I have not read the code. It's my personal shell, shared as is, in case it's useful to someone else.
+> what broke. I have not read the code. It's my personal shell, which I use daily and keep maintaining, shared in
+> case it's useful to someone else.
+>
+> Keep in mind what that means: tomodachi hooks the keyboard and can run with admin rights, and nobody independent
+> has reviewed the code. The [Security & privacy](#security--privacy) section explains what it does and why, but if
+> you want to run it elevated, read [`src/`](src) yourself first, or don't.
 
 ## What it does
 
@@ -141,7 +146,8 @@ The exe in [Releases](../../releases) is built by GitHub Actions from this repos
 ([workflow](.github/workflows/build.yml)), not on my PC. You can also [build it yourself](#build).
 
 As said at the top, the code was written by an AI and I haven't reviewed it. Everything in this section was checked
-against the code, but if you need certainty, read [`src/`](src) or build from source.
+against the code by the same AI that wrote it, not by me or anyone else. If you need certainty, read [`src/`](src)
+or build from source.
 
 ## Build
 
