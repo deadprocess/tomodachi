@@ -22,5 +22,6 @@ internal static class Paths
     public static string ConfigFile => Path.Combine(Root, "config.json");
     public static string RestoreJournalFile => Path.Combine(Root, "restore-journal.json");
     public static string LaunchHistoryFile => Path.Combine(Root, "launch-history.json");
+    public static string PinnedAppsFile => Path.Combine(Root, "pinned-apps.json");
     public static string IconCacheDir => Path.Combine(LocalRoot, "icons");
 }

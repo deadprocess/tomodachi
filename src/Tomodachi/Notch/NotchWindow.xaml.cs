@@ -128,7 +128,7 @@ public partial class NotchWindow : OverlayWindow
     /// <summary>Im Power-Reiter bestätigt. Die Notch ist dann schon zugeklappt.</summary>
     public event Action<PowerAction>? PowerRequested;
 
-    internal void Initialize(AppIndex index, LaunchHistory history, WidgetsController widgets, TomodachiConfig config)
+    internal void Initialize(AppIndex index, LaunchHistory history, PinnedApps pinned, WidgetsController widgets, TomodachiConfig config)
     {
         RefreshAvatar();
         Settings.Initialize(config);
@@ -136,7 +136,7 @@ public partial class NotchWindow : OverlayWindow
         Settings.DialogClosed += _focus.Mark;
         _history = history;
         _widgets = widgets;
-        Launcher.Initialize(index, history);
+        Launcher.Initialize(index, history, pinned);
         Launcher.LaunchRequested += OnLaunchRequested;
         Launcher.CloseRequested += () => CloseNotch(restoreFocus: true);
         Widgets.Initialize(widgets);

@@ -85,7 +85,7 @@ public partial class App : Application
             _appIndex?.Apps.FirstOrDefault(a => a.Id.Equals(id, StringComparison.OrdinalIgnoreCase))?.Name);
 
         _notch = new NotchWindow();
-        _notch.Initialize(_appIndex, LaunchHistory.Load(), widgets, config);
+        _notch.Initialize(_appIndex, LaunchHistory.Load(), PinnedApps.Load(), widgets, config);
         _notch.Settings.SettingChanged += OnSettingChanged;
         _notch.Settings.RestartRequested += RequestRestart;
         _notch.Settings.QuitRequested += RequestShutdown;

@@ -18,6 +18,8 @@
   <data name="Launcher_NoResults" xml:space="preserve"><value>Keine Treffer</value></data>
   <data name="Launcher_Open" xml:space="preserve"><value>Starten</value></data>
   <data name="Launcher_RunAsAdmin" xml:space="preserve"><value>Als Administrator starten</value></data>
+  <data name="Launcher_Pin" xml:space="preserve"><value>Anpinnen</value></data>
+  <data name="Launcher_Unpin" xml:space="preserve"><value>Lösen</value></data>
 
   <!-- Fenster -->
   <data name="Windows_Minimized" xml:space="preserve"><value>minimiert</value></data>

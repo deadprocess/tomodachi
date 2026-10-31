@@ -5,20 +5,26 @@ using System.Windows.Input;
 
 namespace Tomodachi.Launcher;
 
-/// <summary>Paket 3.3: Suchfeld + Trefferliste. Komplett per Tastatur bedienbar, der Fokus bleibt immer im Suchfeld.</summary>
+/// <summary>
+/// Paket 3.3: Suchfeld + Trefferliste. Komplett per Tastatur bedienbar, der Fokus bleibt immer im Suchfeld.
+/// Above the results a row of up to <see cref="PinnedApps.Max"/> pinned apps as tiles (Ctrl+1 … Ctrl+5 launches them).
+/// </summary>
 public partial class LauncherView : UserControl
 {
     private const int MaxResults = 8;
 
     private readonly ObservableCollection<AppResult> _results = [];
+    private readonly ObservableCollection<AppResult> _pinnedTiles = [];
     private AppIndex? _index;
     private LaunchHistory? _history;
+    private PinnedApps? _pinned;
     private AppEntry? _menuApp;
 
     public LauncherView()
     {
         InitializeComponent();
         Results.ItemsSource = _results;
+        Pinned.ItemsSource = _pinnedTiles;
     }
 
     /// <summary>Gewählte App und ob sie mit Adminrechten starten soll.</summary>
@@ -26,14 +32,18 @@ public partial class LauncherView : UserControl
 
     public event Action? CloseRequested;
 
-    internal void Initialize(AppIndex index, LaunchHistory history)
+    internal void Initialize(AppIndex index, LaunchHistory history, PinnedApps pinned)
     {
         _index = index;
         _history = history;
+        _pinned = pinned;
         index.Changed += () => Dispatcher.BeginInvoke(() =>
         {
-            if (IsVisible) UpdateResults();
+            if (!IsVisible) return;
+            UpdateResults();
+            UpdatePinned();
         });
+        pinned.Changed += UpdatePinned;
     }
 
     /// <summary>Beim Öffnen: leeres Suchfeld, zuletzt genutzte Apps.</summary>
@@ -41,6 +51,7 @@ public partial class LauncherView : UserControl
     {
         Query.Text = "";
         UpdateResults();
+        UpdatePinned();
     }
 
     /// <summary>
@@ -58,6 +69,7 @@ public partial class LauncherView : UserControl
     {
         Placeholder.Visibility = Query.Text.Length == 0 ? Visibility.Visible : Visibility.Collapsed;
         UpdateResults();
+        UpdatePinnedVisibility();
     }
 
     private void UpdateResults()
@@ -78,6 +90,26 @@ public partial class LauncherView : UserControl
         Results.SelectedIndex = _results.Count > 0 ? 0 : -1;
         NoResults.Visibility = _results.Count == 0 && Query.Text.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
     }
+
+    /// <summary>Rebuilds the tiles from the pinned ids that exist in the index, in pin order.</summary>
+    private void UpdatePinned()
+    {
+        if (_index is null || _pinned is null) return;
+
+        var known = _pinnedTiles.ToDictionary(r => r.App.Id);
+        _pinnedTiles.Clear();
+        foreach (var app in _pinned.Resolve(_index.Apps))
+        {
+            var tile = known.GetValueOrDefault(app.Id) ?? new AppResult(app);
+            _pinnedTiles.Add(tile);
+            if (tile.Icon is null) LoadIcon(tile);
+        }
+        UpdatePinnedVisibility();
+    }
+
+    /// <summary>The tiles are for the no-typing case; they make room for the results as soon as the user types.</summary>
+    private void UpdatePinnedVisibility() =>
+        Pinned.Visibility = _pinnedTiles.Count > 0 && Query.Text.Length == 0 ? Visibility.Visible : Visibility.Collapsed;
 
     private async void LoadIcon(AppResult result)
     {
@@ -106,8 +138,23 @@ public partial class LauncherView : UserControl
                 CloseRequested?.Invoke();
                 e.Handled = true;
                 break;
+            default:
+                if (Keyboard.Modifiers == ModifierKeys.Control && PinnedSlot(e.Key) is { } slot && slot < _pinnedTiles.Count)
+                {
+                    LaunchRequested?.Invoke(_pinnedTiles[slot].App, false);
+                    e.Handled = true;
+                }
+                break;
         }
     }
+
+    /// <summary>Ctrl+1 … Ctrl+5 (top row or numpad) → index of the pinned tile, else null.</summary>
+    private static int? PinnedSlot(Key key) => key switch
+    {
+        >= Key.D1 and <= Key.D5 => key - Key.D1,
+        >= Key.NumPad1 and <= Key.NumPad5 => key - Key.NumPad1,
+        _ => null,
+    };
 
     private void MoveSelection(int delta)
     {
@@ -130,16 +177,44 @@ public partial class LauncherView : UserControl
         }
     }
 
-    /// <summary>Rechtsklick: Treffer auswählen und das Menü (Starten, Als Administrator starten) an der Maus öffnen.</summary>
+    /// <summary>Rechtsklick: Treffer auswählen und das Menü (Starten, Als Administrator starten, Anpinnen) an der Maus öffnen.</summary>
     private void OnResultRightClicked(object sender, MouseButtonEventArgs e)
     {
         if (ResultAt(e) is not { } result) return;
         e.Handled = true;
         Results.SelectedItem = result;
-        _menuApp = result.App;
+        OpenMenu(result.App, Results);
+    }
 
+    private void OnPinnedClicked(object sender, MouseButtonEventArgs e)
+    {
+        if (TileAt(e) is { } tile)
+        {
+            LaunchRequested?.Invoke(tile.App, false);
+            e.Handled = true;
+        }
+    }
+
+    private void OnPinnedRightClicked(object sender, MouseButtonEventArgs e)
+    {
+        if (TileAt(e) is not { } tile) return;
+        e.Handled = true;
+        OpenMenu(tile.App, Pinned);
+    }
+
+    /// <summary>Shows either "Pin" (disabled when the row is full) or "Unpin", depending on the app.</summary>
+    private void OpenMenu(AppEntry app, UIElement target)
+    {
+        _menuApp = app;
         var menu = (ContextMenu)Resources["ResultMenu"];
-        menu.PlacementTarget = Results;
+        var pinned = _pinned?.IsPinned(app.Id) ?? false;
+        var pinItem = (MenuItem)menu.Items[2];
+        var unpinItem = (MenuItem)menu.Items[3];
+        pinItem.Visibility = pinned ? Visibility.Collapsed : Visibility.Visible;
+        pinItem.IsEnabled = _pinned is { IsFull: false };
+        unpinItem.Visibility = pinned ? Visibility.Visible : Visibility.Collapsed;
+
+        menu.PlacementTarget = target;
         menu.Placement = System.Windows.Controls.Primitives.PlacementMode.MousePoint;
         menu.IsOpen = true;
     }
@@ -159,6 +234,16 @@ public partial class LauncherView : UserControl
         if (_menuApp is { } app) LaunchRequested?.Invoke(app, true);
     }
 
+    private void OnMenuPin(object sender, RoutedEventArgs e)
+    {
+        if (_menuApp is { } app) _pinned?.Pin(app.Id);
+    }
+
+    private void OnMenuUnpin(object sender, RoutedEventArgs e)
+    {
+        if (_menuApp is { } app) _pinned?.Unpin(app.Id);
+    }
+
     /// <summary>Das Menü hatte den Tastaturfokus. Danach wieder ins Suchfeld, damit man weitertippen kann.</summary>
     private void OnResultMenuClosed(object sender, RoutedEventArgs e)
     {
@@ -169,5 +254,10 @@ public partial class LauncherView : UserControl
     private AppResult? ResultAt(MouseButtonEventArgs e) =>
         ItemsControl.ContainerFromElement(Results, (DependencyObject)e.OriginalSource) is ListBoxItem { Content: AppResult result }
             ? result
+            : null;
+
+    private AppResult? TileAt(MouseButtonEventArgs e) =>
+        ItemsControl.ContainerFromElement(Pinned, (DependencyObject)e.OriginalSource) is ContentPresenter { Content: AppResult tile }
+            ? tile
             : null;
 }

@@ -106,7 +106,7 @@ Alternativen:
 |------|-----------------|--------|-------------|
 | 3.1 ✅ | App-Index       | Startmenü-Verknüpfungen (User und ProgramData), Store-Apps über `shell:AppsFolder`, Icons extrahieren und cachen | Alle installierten Apps mit Icon gelistet |
 | 3.2 ✅ | Suche & Ranking | Fuzzy-Match, Frecency (häufig/zuletzt benutzt) wird gespeichert | „vsc“ findet VS Code an erster Stelle |
-| 3.3 🟡 | Launcher-UI     | In der ausgeklappten Notch: Suchfeld, Ergebnisliste, ↑↓/Enter/Esc, Ctrl+Shift+Enter startet als Admin | Komplett per Tastatur bedienbar |
+| 3.3 🟡 | Launcher-UI     | In der ausgeklappten Notch: Suchfeld, Ergebnisliste, ↑↓/Enter/Esc, Ctrl+Shift+Enter startet als Admin. Rechtsklick → Anpinnen: bis zu 5 Kacheln über der Liste (`pinned-apps.json`), Ctrl+1…5 startet sie | Komplett per Tastatur bedienbar |
 | 3.4  | Extras          | Rechner, Websuche, `ms-settings:`-Seiten, Power-Befehle (Herunterfahren, Neustart, Sperren, Energiesparen) | „shutdown“ und „2*21“ funktionieren |
 
 > **Stand 3.1:** `AppIndex` liest `shell:AppsFolder` (= „Alle Apps“ des Startmenüs, klassisch + Store) auf einem eigenen STA-Thread:
